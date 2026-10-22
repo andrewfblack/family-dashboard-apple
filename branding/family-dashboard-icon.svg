@@ -1,9 +1,54 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <rect width="1024" height="1024" rx="190" fill="#172033"/>
-  <path d="M176 432 512 136l336 296v404H176Z" fill="#0E1525" stroke="#F7E7C7" stroke-width="18" stroke-linejoin="round"/>
-  <rect x="238" y="350" width="238" height="205" rx="42" fill="#F26B5E"/>
-  <rect x="548" y="350" width="238" height="205" rx="42" fill="#35B8B0"/>
-  <rect x="238" y="596" width="238" height="170" rx="42" fill="#F6C453"/>
-  <rect x="548" y="596" width="238" height="170" rx="42" fill="#9B7EDE"/>
-  <path d="M454 766h116V638c0-18-14-32-32-32h-52c-18 0-32 14-32 32Z" fill="#172033"/>
+
+  <!-- Four rounded dashboard panels. -->
+  <rect x="100" y="100" width="401" height="401" rx="72" fill="#F26B5E"/>
+  <rect x="523" y="100" width="401" height="401" rx="72" fill="#35B8B0"/>
+  <rect x="100" y="523" width="401" height="401" rx="72" fill="#F6C453"/>
+  <rect x="523" y="523" width="401" height="401" rx="72" fill="#9B7EDE"/>
+
+  <!-- Each tile gets a simple family-dashboard category symbol. -->
+  <g fill="#F7E7C7" opacity=".86">
+    <!-- Family: four small people. -->
+    <g transform="translate(300 300) scale(1.55) translate(-347 -420)">
+    <circle cx="306" cy="405" r="10"/>
+    <circle cx="334" cy="397" r="12"/>
+    <circle cx="362" cy="397" r="12"/>
+    <circle cx="390" cy="405" r="10"/>
+    <rect x="294" y="420" width="24" height="30" rx="12"/>
+    <rect x="318" y="413" width="32" height="38" rx="16"/>
+    <rect x="348" y="413" width="32" height="38" rx="16"/>
+    <rect x="376" y="420" width="24" height="30" rx="12"/>
+    </g>
+
+    <!-- Calendar: month grid with binding tabs. -->
+    <g transform="translate(724 300) scale(1.35) translate(-678 -430)">
+    <rect x="618" y="382" width="120" height="96" rx="16"/>
+    <rect x="618" y="402" width="120" height="14" fill="#35B8B0"/>
+    <rect x="640" y="370" width="14" height="28" rx="7"/>
+    <rect x="702" y="370" width="14" height="28" rx="7"/>
+    <circle cx="650" cy="438" r="7" fill="#35B8B0"/>
+    <circle cx="678" cy="438" r="7" fill="#35B8B0"/>
+    <circle cx="706" cy="438" r="7" fill="#35B8B0"/>
+    <circle cx="650" cy="460" r="7" fill="#35B8B0"/>
+    <circle cx="678" cy="460" r="7" fill="#35B8B0"/>
+    </g>
+
+    <!-- Meals: a filled menu notebook with fork and knife cutouts. -->
+    <g transform="translate(300 724) scale(1.35) translate(-346 -700)">
+    <rect x="286" y="640" width="120" height="120" rx="14"/>
+    <rect x="276" y="665" width="16" height="12" rx="3"/>
+    <rect x="276" y="696" width="16" height="12" rx="3"/>
+    <rect x="276" y="727" width="16" height="12" rx="3"/>
+    <path d="M320 678v48m-12-48v22c0 7 5 12 12 12s12-5 12-12v-22m-12 34v18" fill="none" stroke="#F6C453" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M370 678v52m-10-52v24c0 7 4 12 10 12s10-5 10-12v-24" fill="none" stroke="#F6C453" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Weather: sun behind a simple cloud. -->
+    <g transform="translate(724 724) scale(.9) translate(-720 -705)">
+    <circle cx="710" cy="675" r="24"/>
+    <path d="M628 724c0-20 16-36 36-36 7-25 30-42 57-42 31 0 56 22 60 51 17 2 30 16 30 33 0 19-15 34-34 34H662c-19 0-34-15-34-34 0-2 0-4 0-6Z"/>
+    </g>
+  </g>
+
 </svg>
