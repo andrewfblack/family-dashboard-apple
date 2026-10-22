@@ -19,7 +19,7 @@ concurrency:
 jobs:
   release:
     name: Archive and upload Apple apps
-    runs-on: macos-14
+    runs-on: macos-15
     environment: app-store
     permissions:
       contents: read
@@ -36,7 +36,7 @@ jobs:
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.2"
+          xcode-version: "26.2"
 
       - name: Validate required secrets
         shell: bash
