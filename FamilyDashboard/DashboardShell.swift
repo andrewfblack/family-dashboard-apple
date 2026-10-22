@@ -74,6 +74,7 @@ struct TabContent: View {
             BackgroundView()
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                DashboardHeader(title: payload?.title ?? "Family Dashboard")
                 if let payload {
                     switch tab {
                     case .home: HomeTab(payload: payload)
@@ -108,6 +109,7 @@ struct TabContent: View {
                 .frame(maxWidth: 900)
                 .frame(maxWidth: .infinity)
             }
+            .background(Color.clear)
         }
         .refreshable {
             await model.refresh()
@@ -116,16 +118,63 @@ struct TabContent: View {
     }
 }
 
+/// The Roku-style dashboard heading.
+struct DashboardHeader: View {
+    @Environment(\.dashboardTheme) private var theme
+    let title: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(theme.header)
+            Spacer()
+            Text(Date.now.formatted(date: .complete, time: .shortened))
+                .font(.caption)
+                .foregroundStyle(theme.muted)
+        }
+        .padding(.horizontal, 4)
+    }
+}
+
 /// Today's events, the meal and the climate.
 struct HomeTab: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showingMeals = false
     let payload: DashboardPayload
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            DashboardCard("Today", symbol: "calendar") {
+        Group {
+            if sizeClass == .regular {
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        todayCard
+                        MonthCalendarView(month: payload.monthCalendar)
+                    }
+                    VStack(alignment: .leading, spacing: 16) {
+                        mealCard
+                        climateCard
+                    }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 16) {
+                    todayCard
+                    MonthCalendarView(month: payload.monthCalendar)
+                    mealCard
+                    climateCard
+                }
+            }
+        }
+        .sheet(isPresented: $showingMeals) {
+            MealPlanView(meals: payload.weeklyMealPlan)
+        }
+    }
+
+    @ViewBuilder
+    private var todayCard: some View {
+        DashboardCard("Today", symbol: "calendar") {
                 if payload.calendarEvents.isEmpty {
                     Text("No events today")
                         .font(.subheadline)
@@ -138,7 +187,10 @@ struct HomeTab: View {
                     }
                 }
             }
+    }
 
+    @ViewBuilder
+    private var mealCard: some View {
             DashboardCard("Meal plan", symbol: "fork.knife") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(payload.mealPlan.isEmpty ? "No meal planned" : payload.mealPlan)
@@ -154,7 +206,10 @@ struct HomeTab: View {
                     .tint(theme.accentColor)
                 }
             }
+    }
 
+    @ViewBuilder
+    private var climateCard: some View {
             DashboardCard("Climate", symbol: "thermometer.medium") {
                 HStack(spacing: 16) {
                     MetricTile(
@@ -171,11 +226,8 @@ struct HomeTab: View {
                     )
                 }
             }
-        }
-        .sheet(isPresented: $showingMeals) {
-            MealPlanView(meals: payload.weeklyMealPlan)
-        }
     }
+
 }
 
 /// The rolling family schedule.
