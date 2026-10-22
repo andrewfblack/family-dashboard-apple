@@ -15,9 +15,11 @@ struct TVDashboardView: View {
             TVBackgroundView()
             Color.black.opacity(0.08).ignoresSafeArea()
             VStack(spacing: 24) {
-                VStack(spacing: 0) {
-                    TVHeaderView()
+                HStack(alignment: .center, spacing: 28) {
                     TVTabBarView()
+                        .frame(maxWidth: .infinity)
+                    TVHeaderView()
+                        .frame(width: 440, alignment: .leading)
                 }
                 .background(theme.itemBackgroundColor)
                 ScrollView {
@@ -32,24 +34,22 @@ struct TVDashboardView: View {
     }
 }
 
-/// The title and clock on the television dashboard.
+/// The title and clock shown beside the navigation bar.
 private struct TVHeaderView: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
-        HStack(alignment: .lastTextBaseline) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(model.payload?.title ?? "Family Dashboard")
-                .font(.system(size: 38, weight: .bold))
+                .font(.system(size: 30, weight: .bold))
                 .foregroundStyle(theme.header)
-            Spacer()
             Text(Date.now.formatted(date: .complete, time: .shortened))
-                .font(.title2)
+                .font(.headline)
                 .foregroundStyle(theme.muted)
         }
-        .padding(.horizontal, 42)
-        .padding(.top, 12)
-        .padding(.bottom, 26)
+        .padding(.trailing, 42)
+        .padding(.vertical, 16)
     }
 }
 
@@ -99,7 +99,7 @@ private struct TVTabButton: View {
         .foregroundStyle(isSelected ? theme.accentColor : theme.body)
         .background(
             isSelected || isFocused
-                ? theme.backgroundColor.opacity(0.92)
+                ? Color.black.opacity(0.55)
                 : theme.itemBackgroundColor,
             in: RoundedRectangle(cornerRadius: 14)
         )
@@ -141,19 +141,31 @@ struct TVTabContent: View {
 struct TVHomeTab: View {
     @Environment(\.dashboardTheme) private var theme
     let payload: DashboardPayload
+    @State private var showingAllTodayEvents = false
+    @State private var showingWeeklyMeals = false
 
     var body: some View {
         HStack(alignment: .top, spacing: 22) {
-            DashboardCard("Today's Calendar", symbol: "calendar") {
+            DashboardCard(
+                "Today's Calendar",
+                symbol: "calendar",
+                onActivate: { showingAllTodayEvents.toggle() }
+            ) {
                 VStack(alignment: .leading, spacing: 16) {
-                    if payload.calendarEvents.isEmpty {
+                    let events = showingAllTodayEvents ? payload.todayEvents : payload.calendarEvents
+                    if events.isEmpty {
                         Text("No events today")
                             .font(.title3)
                             .foregroundStyle(theme.muted)
                     } else {
-                        ForEach(payload.calendarEvents) { event in
+                        ForEach(events) { event in
                             EventRow(event: event)
                         }
+                    }
+                    if !payload.todayEvents.isEmpty {
+                        Text(showingAllTodayEvents ? "Select to show fewer events" : "Select to show all events")
+                            .font(.caption)
+                            .foregroundStyle(theme.muted)
                     }
                     Divider().overlay(theme.itemBorderColor)
                     HStack {
@@ -168,11 +180,30 @@ struct TVHomeTab: View {
             .frame(maxWidth: .infinity, alignment: .top)
 
             VStack(spacing: 22) {
-                DashboardCard("Meal plan", symbol: "fork.knife") {
+                DashboardCard(
+                    "Meal plan",
+                    symbol: "fork.knife",
+                    onActivate: { showingWeeklyMeals.toggle() }
+                ) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(payload.mealPlan.isEmpty ? "No meal planned" : payload.mealPlan)
-                            .font(.system(size: 34, weight: .semibold))
-                            .foregroundStyle(theme.body)
+                        if showingWeeklyMeals {
+                            ForEach(payload.weeklyMealPlan) { plan in
+                                HStack {
+                                    Text(plan.day)
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(plan.isToday ? theme.accentColor : theme.muted)
+                                        .frame(width: 86, alignment: .leading)
+                                    Text(plan.meal.isEmpty ? "No meal planned" : plan.meal)
+                                        .font(.subheadline)
+                                        .foregroundStyle(theme.body)
+                                        .lineLimit(1)
+                                }
+                            }
+                        } else {
+                            Text(payload.mealPlan.isEmpty ? "No meal planned" : payload.mealPlan)
+                                .font(.system(size: 34, weight: .semibold))
+                                .foregroundStyle(theme.body)
+                        }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

@@ -23,6 +23,7 @@ public struct DashboardCard<Content: View>: View {
 
     private let title: String
     private let symbol: String?
+    private let onActivate: (() -> Void)?
     private let content: Content
 
     private var cardBackground: Color {
@@ -42,9 +43,15 @@ public struct DashboardCard<Content: View>: View {
     }
 
     /// Create a card.
-    public init(_ title: String, symbol: String? = nil, @ViewBuilder content: () -> Content) {
+    public init(
+        _ title: String,
+        symbol: String? = nil,
+        onActivate: (() -> Void)? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
         self.title = title
         self.symbol = symbol
+        self.onActivate = onActivate
         self.content = content()
     }
 
@@ -73,6 +80,9 @@ public struct DashboardCard<Content: View>: View {
         .focused($isFocused)
         .scaleEffect(isFocused ? 1.015 : 1)
         #endif
+        .onTapGesture {
+            onActivate?()
+        }
     }
 }
 
@@ -134,7 +144,7 @@ public struct EventRow: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(theme.muted)
                 .lineLimit(1)
-                .frame(width: 108, alignment: .leading)
+                .frame(width: 124, alignment: .leading)
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color(hex: event.color ?? "E5A84B"))
                 .frame(width: 4, height: 22)
