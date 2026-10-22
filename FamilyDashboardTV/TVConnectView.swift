@@ -9,6 +9,7 @@ import SwiftUI
 /// Assistant.
 struct TVConnectView: View {
     @Environment(DashboardViewModel.self) private var model
+    @State private var isSearching = false
 
     var body: some View {
         let theme = model.theme
@@ -57,10 +58,46 @@ struct TVConnectView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(theme.accentColor)
                     .disabled(model.isWaitingForApproval)
+
+                    Button {
+                        isSearching = true
+                        model.startDiscovery()
+                    } label: {
+                        Label("Find Home Assistant", systemImage: "magnifyingglass")
+                            .font(.title3)
+                            .frame(width: 320)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(theme.accentColor)
+
+                    if isSearching && model.discoveredServers.isEmpty {
+                        ProgressView("Searching…")
+                            .tint(theme.accentColor)
+                    }
+
+                    ForEach(model.discoveredServers) { server in
+                        Button {
+                            Task { await model.useServer(server) }
+                        } label: {
+                            VStack(spacing: 3) {
+                                Text(server.name)
+                                    .font(.headline)
+                                Text(server.address)
+                                    .font(.caption)
+                                    .foregroundStyle(theme.muted)
+                            }
+                            .frame(width: 320)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(theme.accentColor)
+                    }
                 }
             }
         }
         .padding(60)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onDisappear {
+            model.stopDiscovery()
+        }
     }
 }
