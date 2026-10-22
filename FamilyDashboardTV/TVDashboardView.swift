@@ -10,48 +10,9 @@ struct TVDashboardView: View {
     @Environment(DashboardViewModel.self) private var model
 
     var body: some View {
-        let theme = model.theme
-        let payload = model.payload
-
         VStack(spacing: 24) {
-            HStack {
-                Text(payload?.title ?? "Family Dashboard")
-                    .font(.system(size: 44, weight: .bold))
-                    .foregroundStyle(theme.header)
-                Spacer()
-                Text(Date.now.formatted(date: .complete, time: .shortened))
-                    .font(.title3)
-                    .foregroundStyle(theme.muted)
-            }
-            .padding(.horizontal, 60)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
-                    ForEach(model.tabs) { tab in
-                        Button {
-                            model.selectedTab = tab
-                        } label: {
-                            Label(tab.title, systemImage: tab.symbol)
-                                .font(.system(size: 24, weight: .medium))
-                                .padding(.horizontal, 22)
-                                .padding(.vertical, 12)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(
-                            model.selectedTab == tab ? theme.background : theme.body
-                        )
-                        .background(
-                            model.selectedTab == tab ? theme.accentColor : theme.itemBackgroundColor,
-                            in: Capsule()
-                        )
-                        .overlay(
-                            Capsule().stroke(theme.itemBorderColor, lineWidth: 1)
-                        )
-                    }
-                }
-                .padding(.horizontal, 60)
-            }
-
+            TVHeaderView()
+            TVTabBarView()
             ScrollView {
                 TVTabContent()
                     .padding(.horizontal, 60)
@@ -59,6 +20,56 @@ struct TVDashboardView: View {
             }
         }
         .padding(.top, 30)
+    }
+}
+
+/// The title and clock on the television dashboard.
+private struct TVHeaderView: View {
+    @Environment(DashboardViewModel.self) private var model
+    @Environment(\.dashboardTheme) private var theme
+
+    var body: some View {
+        HStack {
+            Text(model.payload?.title ?? "Family Dashboard")
+                .font(.system(size: 44, weight: .bold))
+                .foregroundStyle(theme.header)
+            Spacer()
+            Text(Date.now.formatted(date: .complete, time: .shortened))
+                .font(.title3)
+                .foregroundStyle(theme.muted)
+        }
+        .padding(.horizontal, 60)
+    }
+}
+
+/// The remote-friendly horizontal tab rail.
+private struct TVTabBarView: View {
+    @Environment(DashboardViewModel.self) private var model
+    @Environment(\.dashboardTheme) private var theme
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
+                ForEach(model.tabs) { tab in
+                    Button {
+                        model.selectedTab = tab
+                    } label: {
+                        Label(tab.title, systemImage: tab.symbol)
+                            .font(.system(size: 24, weight: .medium))
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 12)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(model.selectedTab == tab ? theme.background : theme.body)
+                    .background(
+                        model.selectedTab == tab ? theme.accentColor : theme.itemBackgroundColor,
+                        in: Capsule()
+                    )
+                    .overlay(Capsule().stroke(theme.itemBorderColor, lineWidth: 1))
+                }
+            }
+            .padding(.horizontal, 60)
+        }
     }
 }
 
