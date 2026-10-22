@@ -43,7 +43,9 @@ struct DashboardShell: View {
                 .background(Color.clear)
             }
         }
-        .background(BackgroundView())
+        .background(Color.clear)
+        .toolbarBackground(.hidden, for: .tabBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
