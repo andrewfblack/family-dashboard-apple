@@ -60,11 +60,15 @@ public final class DashboardViewModel {
 
     /// Load the stored credential, read the dashboard and open the stream.
     public func start() async {
+        // Keep the paired state even if the first network request is
+        // temporarily unavailable. A Tailscale/VPN transition or an app
+        // update must not send the user through pairing again.
+        isPaired = await session.hasStoredCredential()
         do {
             let configuration = await session.configuration
             serverAddress = configuration.address
             let restored = try await session.restore()
-            isPaired = restored != nil
+            isPaired = await session.hasStoredCredential()
             if restored != nil {
                 payload = restored
                 startStream()
@@ -72,6 +76,7 @@ public final class DashboardViewModel {
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
+            isPaired = await session.hasStoredCredential()
         }
     }
 

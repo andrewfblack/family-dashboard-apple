@@ -12,7 +12,7 @@ struct RootView: View {
             BackgroundView()
                 .zIndex(0)
             Group {
-                if model.isPaired, model.payload != nil {
+                if model.isPaired {
                     DashboardShell()
                 } else {
                     ConnectView()

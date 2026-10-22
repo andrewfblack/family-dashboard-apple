@@ -33,6 +33,12 @@ public actor DashboardSession {
         client
     }
 
+    /// Whether this device still has a stored credential.
+    public func hasStoredCredential() async -> Bool {
+        guard let token = await credentialStore.load() else { return false }
+        return !token.isEmpty
+    }
+
     /// Load the stored credential and read the dashboard.
     ///
     /// - Returns: the dashboard, or nil when the device is not paired yet.
