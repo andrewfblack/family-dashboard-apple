@@ -56,6 +56,9 @@ jobs:
           key_path="$RUNNER_TEMP/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
           printf '%s' "$APP_STORE_CONNECT_PRIVATE_KEY" > "$key_path"
           chmod 600 "$key_path"
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          cp "$key_path" "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+          chmod 600 "$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
           echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
 
       - name: Archive iOS app
