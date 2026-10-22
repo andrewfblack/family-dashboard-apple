@@ -25,12 +25,9 @@ struct DashboardShell: View {
                         Label(tab.title, systemImage: tab.symbol)
                             .tag(tab)
                     }
-                    .scrollContentBackground(.hidden)
-                    .background(Color.clear)
                     .navigationTitle("Family Dashboard")
                 } detail: {
                     TabContent(tab: model.selectedTab)
-                        .background(Color.clear)
                 }
             } else {
                 TabView(selection: selection) {
@@ -40,12 +37,8 @@ struct DashboardShell: View {
                             .tag(tab)
                     }
                 }
-                .background(Color.clear)
             }
         }
-        .background(Color.clear)
-        .toolbarBackground(.hidden, for: .tabBar)
-        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -116,7 +109,6 @@ struct TabContent: View {
         .refreshable {
             await model.refresh()
         }
-        .scrollContentBackground(.hidden)
     }
 }
 

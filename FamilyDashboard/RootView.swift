@@ -8,18 +8,14 @@ struct RootView: View {
     @Environment(DashboardViewModel.self) private var model
 
     var body: some View {
-        ZStack {
-            BackgroundView()
-                .zIndex(0)
-            Group {
-                if model.isPaired {
-                    DashboardShell()
-                } else {
-                    ConnectView()
-                }
+        Group {
+            if model.isPaired {
+                DashboardShell()
+            } else {
+                ConnectView()
             }
-            .zIndex(1)
         }
+        .background(BackgroundView())
         .alert(
             "Something went wrong",
             isPresented: Binding(
