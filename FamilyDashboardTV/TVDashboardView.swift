@@ -11,20 +11,23 @@ struct TVDashboardView: View {
     @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 0) {
-                TVHeaderView()
-                TVTabBarView()
+        ZStack {
+            TVBackgroundView()
+            VStack(spacing: 24) {
+                VStack(spacing: 0) {
+                    TVHeaderView()
+                    TVTabBarView()
+                }
+                .background(theme.itemBackgroundColor)
+                ScrollView {
+                    TVTabContent()
+                        .padding(.horizontal, 60)
+                        .padding(.bottom, 40)
+                }
+                .focusSection()
             }
-            .background(theme.itemBackgroundColor)
-            ScrollView {
-                TVTabContent()
-                    .padding(.horizontal, 60)
-                    .padding(.bottom, 40)
-            }
-            .focusSection()
+            .padding(.top, 30)
         }
-        .padding(.top, 30)
     }
 }
 
@@ -131,19 +134,22 @@ struct TVHomeTab: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 28) {
-            DashboardCard("Today", symbol: "calendar") {
-                VStack(spacing: 8) {
-                    if payload.calendarEvents.isEmpty {
-                        Text("No events today")
-                            .font(.title3)
-                            .foregroundStyle(theme.muted)
-                    } else {
-                        ForEach(payload.calendarEvents) { event in
-                            EventRow(event: event)
+            VStack(spacing: 28) {
+                DashboardCard("Today", symbol: "calendar") {
+                    VStack(spacing: 8) {
+                        if payload.calendarEvents.isEmpty {
+                            Text("No events today")
+                                .font(.title3)
+                                .foregroundStyle(theme.muted)
+                        } else {
+                            ForEach(payload.calendarEvents) { event in
+                                EventRow(event: event)
+                            }
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                TVMonthCalendarView(month: payload.monthCalendar)
             }
             .frame(maxWidth: .infinity)
 
@@ -178,6 +184,46 @@ struct TVHomeTab: View {
             }
             .frame(maxWidth: .infinity)
         }
+    }
+}
+
+/// A Roku-style monthly calendar for the Apple TV Home screen.
+private struct TVMonthCalendarView: View {
+    @Environment(\.dashboardTheme) private var theme
+    let month: MonthCalendar
+    private let weekdayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+
+    var body: some View {
+        DashboardCard(month.title.isEmpty ? "Calendar" : month.title, symbol: "calendar") {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14), count: 7), spacing: 10) {
+                ForEach(weekdayNames, id: \.self) { weekday in
+                    Text(weekday)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(theme.muted)
+                }
+                ForEach(Array(slots.enumerated()), id: \.offset) { _, day in
+                    if day == 0 {
+                        Color.clear.frame(minHeight: 34)
+                    } else {
+                        Text("\(day)")
+                            .font(.title3.weight(day == month.today ? .bold : .regular))
+                            .foregroundStyle(day == month.today ? theme.backgroundColor : theme.body)
+                            .frame(maxWidth: .infinity, minHeight: 34)
+                            .background(
+                                day == month.today
+                                    ? theme.accentColor
+                                    : (month.eventDays.contains(day) ? theme.selectedBackgroundColor : .clear),
+                                in: Circle()
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private var slots: [Int] {
+        Array(repeating: 0, count: max(0, month.firstWeekday))
+            + Array(1...max(1, month.daysInMonth))
     }
 }
 
