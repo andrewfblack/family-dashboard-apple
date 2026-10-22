@@ -49,6 +49,9 @@ public struct DashboardCard<Content: View>: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(theme.itemBorderColor, lineWidth: 1)
         )
+        #if os(tvOS)
+        .focusable()
+        #endif
     }
 }
 
@@ -180,6 +183,9 @@ public struct ScheduleDayCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(day.isToday ? theme.accentColor : theme.itemBorderColor, lineWidth: day.isToday ? 2 : 1)
         )
+        #if os(tvOS)
+        .focusable()
+        #endif
     }
 }
 

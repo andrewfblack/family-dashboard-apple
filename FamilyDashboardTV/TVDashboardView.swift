@@ -18,6 +18,7 @@ struct TVDashboardView: View {
                     .padding(.horizontal, 60)
                     .padding(.bottom, 40)
             }
+            .focusSection()
         }
         .padding(.top, 30)
     }
@@ -62,6 +63,7 @@ private struct TVTabBarView: View {
             }
             .padding(.horizontal, 60)
         }
+        .focusSection()
     }
 }
 
