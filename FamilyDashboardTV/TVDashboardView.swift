@@ -4,8 +4,10 @@ import SwiftUI
 
 /// The dashboard on a television.
 ///
-/// The tabs sit in a row at the top and the focus moves sideways, which is
-/// how a remote is used.
+/// The layout intentionally follows the Roku dashboard: navigation lives in
+/// a narrow rail on the left and the selected screen gets the rest of the
+/// display. This gives the Siri Remote a predictable up/down navigation path
+/// and leaves the content large enough to read from across a room.
 struct TVDashboardView: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
@@ -13,20 +15,26 @@ struct TVDashboardView: View {
     var body: some View {
         ZStack {
             TVBackgroundView()
-            VStack(spacing: 24) {
+            Color.black.opacity(0.08).ignoresSafeArea()
+            HStack(spacing: 0) {
+                TVSidebarView()
+                    .frame(width: 92)
+                Rectangle()
+                    .fill(theme.itemBorderColor.opacity(0.45))
+                    .frame(width: 1)
                 VStack(spacing: 0) {
                     TVHeaderView()
-                    TVTabBarView()
+                    ScrollView {
+                        TVTabContent()
+                            .padding(.horizontal, 42)
+                            .padding(.bottom, 42)
+                    }
+                    .focusSection()
                 }
-                .background(theme.itemBackgroundColor)
-                ScrollView {
-                    TVTabContent()
-                        .padding(.horizontal, 60)
-                        .padding(.bottom, 40)
-                }
-                .focusSection()
             }
-            .padding(.top, 30)
+            .padding(.vertical, 28)
+            .padding(.leading, 28)
+            .padding(.trailing, 42)
         }
     }
 }
@@ -37,48 +45,58 @@ private struct TVHeaderView: View {
     @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
-        HStack {
+        HStack(alignment: .lastTextBaseline) {
             Text(model.payload?.title ?? "Family Dashboard")
-                .font(.system(size: 44, weight: .bold))
+                .font(.system(size: 38, weight: .bold))
                 .foregroundStyle(theme.header)
             Spacer()
             Text(Date.now.formatted(date: .complete, time: .shortened))
-                .font(.title3)
+                .font(.title2)
                 .foregroundStyle(theme.muted)
         }
-        .padding(.horizontal, 60)
-        .padding(.top, 22)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 42)
+        .padding(.top, 12)
+        .padding(.bottom, 26)
     }
 }
 
-/// The remote-friendly horizontal tab rail.
-private struct TVTabBarView: View {
+/// A Roku-style vertical tab rail.
+private struct TVSidebarView: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
-                ForEach(model.tabs) { tab in
-                    TVTabButton(
-                        tab: tab,
-                        isSelected: model.selectedTab == tab,
-                        theme: theme
-                    ) {
-                        model.selectedTab = tab
+        VStack(alignment: .leading, spacing: 16) {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 12) {
+                    ForEach(model.tabs) { tab in
+                        TVTabButton(
+                            tab: tab,
+                            isSelected: model.selectedTab == tab,
+                            theme: theme
+                        ) {
+                            model.selectedTab = tab
+                        }
                     }
                 }
             }
-            .padding(.horizontal, 60)
-            .padding(.bottom, 14)
+            .focusSection()
+            Spacer()
+            Image(systemName: "gearshape.fill")
+                .font(.system(size: 22))
+                .foregroundStyle(theme.muted)
+                .frame(maxWidth: .infinity)
+                .accessibilityHidden(true)
         }
-        .focusSection()
+        .padding(.top, 18)
+        .padding(.bottom, 12)
     }
 }
 
 /// One focusable button in the tvOS tab rail.
 private struct TVTabButton: View {
+    @FocusState private var isFocused: Bool
+
     let tab: DashboardTab
     let isSelected: Bool
     let theme: Theme
@@ -87,20 +105,27 @@ private struct TVTabButton: View {
     var body: some View {
         Button(action: select) {
             Image(systemName: tab.symbol)
-                .font(.system(size: 28, weight: .medium))
-                .frame(width: 84, height: 64)
+                .font(.system(size: 24, weight: .medium))
+                .frame(width: 68, height: 62)
         }
         .buttonStyle(.plain)
+        .focused($isFocused)
         .accessibilityLabel(tab.title)
-        .foregroundStyle(isSelected ? theme.backgroundColor : theme.body)
+        .foregroundStyle(isSelected ? theme.accentColor : theme.body)
         .background(
-            isSelected ? theme.accentColor : theme.itemBackgroundColor,
-            in: RoundedRectangle(cornerRadius: 12)
+            isSelected || isFocused
+                ? theme.backgroundColor.opacity(0.92)
+                : theme.itemBackgroundColor,
+            in: RoundedRectangle(cornerRadius: 14)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(isSelected ? theme.selectedBorderColor : theme.itemBorderColor, lineWidth: isSelected ? 2 : 1)
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(
+                    isSelected || isFocused ? theme.selectedBorderColor : theme.itemBorderColor,
+                    lineWidth: isSelected || isFocused ? 3 : 1
+                )
         )
+        .scaleEffect(isSelected || isFocused ? 1.03 : 1)
     }
 }
 
@@ -133,89 +158,94 @@ struct TVHomeTab: View {
     let payload: DashboardPayload
 
     var body: some View {
-        HStack(alignment: .top, spacing: 28) {
-            VStack(spacing: 28) {
-                DashboardCard("Today", symbol: "calendar") {
-                    VStack(spacing: 8) {
-                        if payload.calendarEvents.isEmpty {
-                            Text("No events today")
-                                .font(.title3)
-                                .foregroundStyle(theme.muted)
-                        } else {
-                            ForEach(payload.calendarEvents) { event in
-                                EventRow(event: event)
-                            }
+        HStack(alignment: .top, spacing: 22) {
+            DashboardCard("Today's Calendar", symbol: "calendar") {
+                VStack(alignment: .leading, spacing: 16) {
+                    if payload.calendarEvents.isEmpty {
+                        Text("No events today")
+                            .font(.title3)
+                            .foregroundStyle(theme.muted)
+                    } else {
+                        ForEach(payload.calendarEvents) { event in
+                            EventRow(event: event)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Divider().overlay(theme.itemBorderColor)
+                    HStack {
+                        Text(payload.monthCalendar.title.isEmpty ? "Calendar" : payload.monthCalendar.title)
+                            .font(.headline)
+                            .foregroundStyle(theme.itemHeader)
+                        Spacer()
+                    }
+                    TVMonthCalendarGrid(month: payload.monthCalendar)
                 }
-                TVMonthCalendarView(month: payload.monthCalendar)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .top)
 
-            VStack(spacing: 28) {
+            VStack(spacing: 22) {
                 DashboardCard("Meal plan", symbol: "fork.knife") {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(payload.mealPlan.isEmpty ? "No meal planned" : payload.mealPlan)
                             .font(.system(size: 34, weight: .semibold))
                             .foregroundStyle(theme.body)
-                        Text("Today")
-                            .font(.title3)
-                            .foregroundStyle(theme.muted)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                DashboardCard("Climate", symbol: "thermometer.medium") {
-                    HStack(spacing: 24) {
-                        MetricTile(
-                            label: "Inside",
-                            value: WeatherSymbols.temperature(payload.insideTemperature),
-                            detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
-                            symbol: "house"
-                        )
-                        MetricTile(
-                            label: "Outside",
-                            value: WeatherSymbols.temperature(payload.outsideTemperature),
-                            detail: WeatherSymbols.condition(payload.outsideCondition),
-                            symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
-                        )
-                    }
-                }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .top)
+
+            DashboardCard("Climate", symbol: "thermometer.medium") {
+                VStack(spacing: 28) {
+                    MetricTile(
+                        label: "Inside",
+                        value: WeatherSymbols.temperature(payload.insideTemperature),
+                        detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
+                        symbol: "house"
+                    )
+                    Rectangle()
+                        .fill(theme.itemBorderColor)
+                        .frame(height: 1)
+                    MetricTile(
+                        label: "Outside",
+                        value: WeatherSymbols.temperature(payload.outsideTemperature),
+                        detail: WeatherSymbols.condition(payload.outsideCondition),
+                        symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
+                    )
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .top)
         }
     }
 }
 
-/// A Roku-style monthly calendar for the Apple TV Home screen.
-private struct TVMonthCalendarView: View {
+/// A Roku-style monthly calendar grid for the Apple TV Home screen.
+private struct TVMonthCalendarGrid: View {
     @Environment(\.dashboardTheme) private var theme
     let month: MonthCalendar
     private let weekdayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
     var body: some View {
-        DashboardCard(month.title.isEmpty ? "Calendar" : month.title, symbol: "calendar") {
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14), count: 7), spacing: 10) {
-                ForEach(weekdayNames, id: \.self) { weekday in
-                    Text(weekday)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(theme.muted)
-                }
-                ForEach(Array(slots.enumerated()), id: \.offset) { _, day in
-                    if day == 0 {
-                        Color.clear.frame(minHeight: 34)
-                    } else {
-                        Text("\(day)")
-                            .font(.title3.weight(day == month.today ? .bold : .regular))
-                            .foregroundStyle(day == month.today ? theme.backgroundColor : theme.body)
-                            .frame(maxWidth: .infinity, minHeight: 34)
-                            .background(
-                                day == month.today
-                                    ? theme.accentColor
-                                    : (month.eventDays.contains(day) ? theme.selectedBackgroundColor : .clear),
-                                in: Circle()
-                            )
-                    }
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14), count: 7), spacing: 10) {
+            ForEach(weekdayNames, id: \.self) { weekday in
+                Text(weekday)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(theme.muted)
+            }
+            ForEach(Array(slots.enumerated()), id: \.offset) { _, day in
+                if day == 0 {
+                    Color.clear.frame(minHeight: 34)
+                } else {
+                    Text("\(day)")
+                        .font(.title3.weight(day == month.today ? .bold : .regular))
+                        .foregroundStyle(day == month.today ? theme.backgroundColor : theme.body)
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .background(
+                            day == month.today
+                                ? theme.accentColor
+                                : (month.eventDays.contains(day) ? theme.selectedBackgroundColor : .clear),
+                            in: Circle()
+                        )
                 }
             }
         }
@@ -232,14 +262,21 @@ struct TVCalendarTab: View {
     let payload: DashboardPayload
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .top, spacing: 18) {
-                ForEach(payload.calendarSchedule.days) { day in
-                    ScheduleDayCard(day: day)
-                        .frame(width: 230)
+        GeometryReader { proxy in
+            let spacing: CGFloat = 18
+            let cardWidth = max(220, (proxy.size.width - (spacing * 4)) / 5)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: spacing) {
+                    ForEach(payload.calendarSchedule.days) { day in
+                        ScheduleDayCard(day: day)
+                            .frame(width: cardWidth)
+                    }
                 }
             }
+            .focusSection()
         }
+        .frame(height: 520)
     }
 }
 

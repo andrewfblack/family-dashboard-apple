@@ -44,19 +44,26 @@ struct TVBackgroundView: View {
             if let payload {
                 switch payload.background {
                 case "fall":
-                    Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
+                    backgroundImage(named: "FallBackground")
                 case "winter":
-                    Image("WinterBackground").resizable().aspectRatio(contentMode: .fill)
+                    backgroundImage(named: "WinterBackground")
                 case "spring":
-                    Image("SpringBackground").resizable().aspectRatio(contentMode: .fill)
+                    backgroundImage(named: "SpringBackground")
                 case "summer":
-                    Image("SummerBackground").resizable().aspectRatio(contentMode: .fill)
+                    backgroundImage(named: "SummerBackground")
                 default:
                     EmptyView()
                 }
             }
         }
-        .opacity(0.85)
         .ignoresSafeArea()
+    }
+
+    @ViewBuilder
+    private func backgroundImage(named name: String) -> some View {
+        Image(name)
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .overlay(Color.black.opacity(0.16))
     }
 }

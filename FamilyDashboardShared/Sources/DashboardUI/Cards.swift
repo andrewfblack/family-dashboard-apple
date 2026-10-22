@@ -17,6 +17,9 @@ public extension EnvironmentValues {
 /// A card that holds one part of the dashboard.
 public struct DashboardCard<Content: View>: View {
     @Environment(\.dashboardTheme) private var theme
+    #if os(tvOS)
+    @FocusState private var isFocused: Bool
+    #endif
 
     private let title: String
     private let symbol: String?
@@ -44,13 +47,29 @@ public struct DashboardCard<Content: View>: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 18))
+        .background(
+            #if os(tvOS)
+            isFocused ? theme.backgroundColor.opacity(0.92) : theme.itemBackgroundColor,
+            #else
+            theme.itemBackgroundColor,
+            #endif
+            in: RoundedRectangle(cornerRadius: 18)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(theme.itemBorderColor, lineWidth: 1)
+                .stroke(
+                    #if os(tvOS)
+                    isFocused ? theme.selectedBorderColor : theme.itemBorderColor,
+                    #else
+                    theme.itemBorderColor,
+                    #endif
+                    lineWidth: 1
+                )
         )
         #if os(tvOS)
         .focusable()
+        .focused($isFocused)
+        .scaleEffect(isFocused ? 1.015 : 1)
         #endif
     }
 }
@@ -112,7 +131,8 @@ public struct EventRow: View {
             Text(event.timeLabel)
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(theme.muted)
-                .frame(width: 76, alignment: .leading)
+                .lineLimit(1)
+                .frame(width: 108, alignment: .leading)
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color(hex: event.color ?? "E5A84B"))
                 .frame(width: 4, height: 22)
