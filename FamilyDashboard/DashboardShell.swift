@@ -177,29 +177,28 @@ struct HomeTab: View {
 
 /// The rolling family schedule.
 struct CalendarTab: View {
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let payload: DashboardPayload
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 12) {
+            if sizeClass == .compact {
+                LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(payload.calendarSchedule.days) { day in
                         ScheduleDayCard(day: day)
-                            .frame(width: 180)
                     }
                 }
-                .padding(.horizontal, 1)
-            }
-            .scrollTargetBehavior(.viewAligned)
-
-            if !payload.monthCalendar.events.isEmpty {
-                DashboardCard(payload.monthCalendar.title, symbol: "calendar") {
-                    VStack(spacing: 6) {
-                        ForEach(payload.monthCalendar.events) { event in
-                            EventRow(event: event)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 12) {
+                        ForEach(payload.calendarSchedule.days) { day in
+                            ScheduleDayCard(day: day)
+                                .frame(width: 180)
                         }
                     }
+                    .padding(.horizontal, 1)
                 }
+                .scrollTargetBehavior(.viewAligned)
             }
         }
     }

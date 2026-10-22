@@ -23,6 +23,8 @@ public final class DashboardViewModel {
     public private(set) var pairingCode: String?
     /// Whether the app is waiting for an approval.
     public private(set) var isWaitingForApproval = false
+    /// Home Assistant instances found on the local network.
+    public private(set) var discoveredServers: [DiscoveredServer] = []
     /// The address of the Home Assistant instance.
     public var serverAddress: String
     /// The tab that is open.
@@ -35,6 +37,7 @@ public final class DashboardViewModel {
     private let session: DashboardSession
     private let appVersion: String
     private var streamTask: Task<Void, Never>?
+    private var discovery: HomeAssistantDiscovery?
 
     /// Create the model.
     public init(
@@ -174,6 +177,32 @@ public final class DashboardViewModel {
     /// Clear the last error.
     public func clearError() {
         errorMessage = nil
+    }
+
+    /// Search the local network for Home Assistant.
+    public func startDiscovery() {
+        #if canImport(Darwin)
+        discovery?.stop()
+        let finder = HomeAssistantDiscovery { [weak self] servers in
+            Task { @MainActor in
+                self?.discoveredServers = servers
+            }
+        }
+        discovery = finder
+        finder.start()
+        #endif
+    }
+
+    /// Stop searching the local network.
+    public func stopDiscovery() {
+        discovery?.stop()
+        discovery = nil
+    }
+
+    /// Use a discovered Home Assistant instance.
+    public func useServer(_ server: DiscoveredServer) async {
+        await setServer(server.address)
+        stopDiscovery()
     }
 
     /// Build the authenticated request for an uploaded dashboard background.

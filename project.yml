@@ -59,6 +59,8 @@ targets:
               NSExceptionAllowsInsecureHTTPLoads: true
               NSIncludesSubdomains: true
         NSLocalNetworkUsageDescription: "Family Dashboard connects to your Home Assistant on your local network."
+        NSBonjourServices:
+          - _home-assistant._tcp
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.familydashboard.dashboard
@@ -95,6 +97,8 @@ targets:
               NSExceptionAllowsInsecureHTTPLoads: true
               NSIncludesSubdomains: true
         NSLocalNetworkUsageDescription: "Family Dashboard connects to your Home Assistant on your local network."
+        NSBonjourServices:
+          - _home-assistant._tcp
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.familydashboard.dashboard.tv

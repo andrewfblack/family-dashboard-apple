@@ -8,6 +8,7 @@ struct ConnectView: View {
 
     @State private var code = ""
     @State private var address = ""
+    @State private var isSearching = false
     @FocusState private var codeFocused: Bool
 
     var body: some View {
@@ -81,6 +82,39 @@ struct ConnectView: View {
 
                 DashboardCard("Home Assistant address", symbol: "server.rack") {
                     VStack(alignment: .leading, spacing: 12) {
+                        Button {
+                            isSearching = true
+                            model.startDiscovery()
+                        } label: {
+                            Label("Find Home Assistant on this network", systemImage: "magnifyingglass")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(theme.accentColor)
+
+                        if isSearching && model.discoveredServers.isEmpty {
+                            ProgressView("Searching…")
+                                .font(.caption)
+                        }
+
+                        ForEach(model.discoveredServers) { server in
+                            Button {
+                                address = server.address
+                                Task { await model.useServer(server) }
+                            } label: {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(server.name)
+                                        .font(.headline)
+                                    Text(server.address)
+                                        .font(.caption)
+                                        .foregroundStyle(theme.muted)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(theme.accentColor)
+                        }
+
                         TextField("http://homeassistant.local:8123", text: $address)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
@@ -103,6 +137,9 @@ struct ConnectView: View {
         }
         .onAppear {
             address = model.serverAddress
+        }
+        .onDisappear {
+            model.stopDiscovery()
         }
     }
 }
