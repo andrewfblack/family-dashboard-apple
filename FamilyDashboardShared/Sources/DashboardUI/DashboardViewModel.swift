@@ -1,4 +1,5 @@
 #if canImport(SwiftUI)
+import DashboardCore
 import Foundation
 import Observation
 import SwiftUI

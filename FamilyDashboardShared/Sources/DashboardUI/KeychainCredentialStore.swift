@@ -1,4 +1,5 @@
 #if canImport(Security)
+import DashboardCore
 import Foundation
 import Security
 

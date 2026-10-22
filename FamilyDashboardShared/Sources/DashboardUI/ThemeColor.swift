@@ -1,4 +1,5 @@
 #if canImport(SwiftUI)
+import DashboardCore
 import SwiftUI
 
 extension Color {
