@@ -79,7 +79,7 @@ struct TVTabContent: View {
                 case .climate: TVClimateTab(payload: payload)
                 }
             } else {
-                ProgressView().controlSize(.large)
+                ProgressView()
             }
         }
     }

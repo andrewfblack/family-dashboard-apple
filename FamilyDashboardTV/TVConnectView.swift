@@ -34,7 +34,6 @@ struct TVConnectView: View {
                         .tracking(12)
                         .foregroundStyle(theme.accentColor)
                     ProgressView()
-                        .controlSize(.large)
                         .tint(theme.accentColor)
                 }
             } else {
