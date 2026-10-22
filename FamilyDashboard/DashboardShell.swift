@@ -109,6 +109,7 @@ struct TabContent: View {
         .refreshable {
             await model.refresh()
         }
+        .background(BackgroundView())
     }
 }
 

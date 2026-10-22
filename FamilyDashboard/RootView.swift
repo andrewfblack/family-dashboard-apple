@@ -71,9 +71,11 @@ struct BackgroundView: View {
                 case "uploaded":
                     if let uploadedImage {
                         uploadedImage.resizable().aspectRatio(contentMode: .fill)
+                    } else {
+                        Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
                     }
                 default:
-                    EmptyView()
+                    Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
                 }
             }
         }
