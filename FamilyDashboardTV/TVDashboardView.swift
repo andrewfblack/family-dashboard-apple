@@ -51,25 +51,41 @@ private struct TVTabBarView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
                 ForEach(model.tabs) { tab in
-                    Button {
+                    TVTabButton(
+                        tab: tab,
+                        isSelected: model.selectedTab == tab,
+                        theme: theme
+                    ) {
                         model.selectedTab = tab
-                    } label: {
-                        Label(tab.title, systemImage: tab.symbol)
-                            .font(.system(size: 24, weight: .medium))
-                            .padding(.horizontal, 22)
-                            .padding(.vertical, 12)
                     }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(model.selectedTab == tab ? theme.background : theme.body)
-                    .background(
-                        model.selectedTab == tab ? theme.accentColor : theme.itemBackgroundColor,
-                        in: Capsule()
-                    )
-                    .overlay(Capsule().stroke(theme.itemBorderColor, lineWidth: 1))
                 }
             }
             .padding(.horizontal, 60)
         }
+    }
+}
+
+/// One focusable button in the tvOS tab rail.
+private struct TVTabButton: View {
+    let tab: DashboardTab
+    let isSelected: Bool
+    let theme: Theme
+    let select: () -> Void
+
+    var body: some View {
+        Button(action: select) {
+            Label(tab.title, systemImage: tab.symbol)
+                .font(.system(size: 24, weight: .medium))
+                .padding(.horizontal, 22)
+                .padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(isSelected ? theme.background : theme.body)
+        .background(
+            isSelected ? theme.accentColor : theme.itemBackgroundColor,
+            in: Capsule()
+        )
+        .overlay(Capsule().stroke(theme.itemBorderColor, lineWidth: 1))
     }
 }
 
