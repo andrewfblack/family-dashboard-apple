@@ -82,6 +82,11 @@ targets:
       path: FamilyDashboardTV/Info.plist
       properties:
         CFBundleDisplayName: Family Dashboard
+        CFBundleIcons:
+          CFBundlePrimaryIcon: AppIcon
+        TVTopShelfImage:
+          TVTopShelfPrimaryImage: Top Shelf Image
+          TVTopShelfPrimaryImageWide: Top Shelf Image Wide
         ITSAppUsesNonExemptEncryption: false
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
