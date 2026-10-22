@@ -9,6 +9,7 @@ import FoundationNetworking
 /// The session owns the address, the credential and the dashboard payload, so
 /// the screens only have to ask for what they need.
 public actor DashboardSession {
+    private static let serverAddressKey = "com.familydashboard.serverAddress"
     /// The address and the credential.
     public private(set) var configuration: ServerConfiguration
     /// The last dashboard that was read.
@@ -23,7 +24,11 @@ public actor DashboardSession {
         credentialStore: CredentialStoring = InMemoryCredentialStore(),
         session: URLSession = .shared
     ) {
-        self.configuration = configuration
+        let savedAddress = UserDefaults.standard.string(forKey: Self.serverAddressKey)
+        let savedConfiguration = savedAddress.flatMap {
+            try? ServerConfiguration.make(from: $0)
+        }
+        self.configuration = savedConfiguration ?? configuration
         self.credentialStore = credentialStore
         self.client = HomeAssistantClient(configuration: configuration, session: session)
     }
@@ -82,6 +87,7 @@ public actor DashboardSession {
     /// Point the session at another instance and forget the credential.
     public func setServer(_ server: ServerConfiguration) async {
         configuration = ServerConfiguration(serverURL: server.serverURL)
+        UserDefaults.standard.set(configuration.address, forKey: Self.serverAddressKey)
         await credentialStore.clear()
         payload = nil
         await client.update(configuration: configuration)

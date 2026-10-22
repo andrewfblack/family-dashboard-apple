@@ -89,8 +89,20 @@ struct TabContent: View {
                     case .climate: ClimateTab(payload: payload)
                     }
                 } else {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
+                    VStack(spacing: 16) {
+                        if let errorMessage = model.errorMessage {
+                            Text(errorMessage)
+                                .multilineTextAlignment(.center)
+                            Button("Retry") {
+                                Task { await model.refresh() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else {
+                            ProgressView()
+                            Text("Connecting to Home Assistant…")
+                        }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 220)
                 }
             }
             .padding(20)
