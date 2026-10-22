@@ -4,10 +4,8 @@ import SwiftUI
 
 /// The dashboard on a television.
 ///
-/// The layout intentionally follows the Roku dashboard: navigation lives in
-/// a narrow rail on the left and the selected screen gets the rest of the
-/// display. This gives the Siri Remote a predictable up/down navigation path
-/// and leaves the content large enough to read from across a room.
+/// The layout follows the Roku dashboard: navigation runs across the top and
+/// the selected screen gets the rest of the display.
 struct TVDashboardView: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
@@ -16,25 +14,20 @@ struct TVDashboardView: View {
         ZStack {
             TVBackgroundView()
             Color.black.opacity(0.08).ignoresSafeArea()
-            HStack(spacing: 0) {
-                TVSidebarView()
-                    .frame(width: 92)
-                Rectangle()
-                    .fill(theme.itemBorderColor.opacity(0.45))
-                    .frame(width: 1)
+            VStack(spacing: 24) {
                 VStack(spacing: 0) {
                     TVHeaderView()
-                    ScrollView {
-                        TVTabContent()
-                            .padding(.horizontal, 42)
-                            .padding(.bottom, 42)
-                    }
-                    .focusSection()
+                    TVTabBarView()
                 }
+                .background(theme.itemBackgroundColor)
+                ScrollView {
+                    TVTabContent()
+                        .padding(.horizontal, 60)
+                        .padding(.bottom, 40)
+                }
+                .focusSection()
             }
-            .padding(.vertical, 28)
-            .padding(.leading, 28)
-            .padding(.trailing, 42)
+            .padding(.top, 30)
         }
     }
 }
@@ -60,36 +53,28 @@ private struct TVHeaderView: View {
     }
 }
 
-/// A Roku-style vertical tab rail.
-private struct TVSidebarView: View {
+/// The remote-friendly horizontal tab bar.
+private struct TVTabBarView: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 12) {
-                    ForEach(model.tabs) { tab in
-                        TVTabButton(
-                            tab: tab,
-                            isSelected: model.selectedTab == tab,
-                            theme: theme
-                        ) {
-                            model.selectedTab = tab
-                        }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
+                ForEach(model.tabs) { tab in
+                    TVTabButton(
+                        tab: tab,
+                        isSelected: model.selectedTab == tab,
+                        theme: theme
+                    ) {
+                        model.selectedTab = tab
                     }
                 }
             }
-            .focusSection()
-            Spacer()
-            Image(systemName: "gearshape.fill")
-                .font(.system(size: 22))
-                .foregroundStyle(theme.muted)
-                .frame(maxWidth: .infinity)
-                .accessibilityHidden(true)
+            .padding(.horizontal, 60)
+            .padding(.bottom, 14)
         }
-        .padding(.top, 18)
-        .padding(.bottom, 12)
+        .focusSection()
     }
 }
 
@@ -106,7 +91,7 @@ private struct TVTabButton: View {
         Button(action: select) {
             Image(systemName: tab.symbol)
                 .font(.system(size: 24, weight: .medium))
-                .frame(width: 68, height: 62)
+                .frame(width: 84, height: 64)
         }
         .buttonStyle(.plain)
         .focused($isFocused)
@@ -191,28 +176,26 @@ struct TVHomeTab: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            }
-            .frame(maxWidth: .infinity, alignment: .top)
 
-            DashboardCard("Climate", symbol: "thermometer.medium") {
-                VStack(spacing: 28) {
-                    MetricTile(
-                        label: "Inside",
-                        value: WeatherSymbols.temperature(payload.insideTemperature),
-                        detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
-                        symbol: "house"
-                    )
-                    Rectangle()
-                        .fill(theme.itemBorderColor)
-                        .frame(height: 1)
-                    MetricTile(
-                        label: "Outside",
-                        value: WeatherSymbols.temperature(payload.outsideTemperature),
-                        detail: WeatherSymbols.condition(payload.outsideCondition),
-                        symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
-                    )
+                DashboardCard("Climate", symbol: "thermometer.medium") {
+                    HStack(spacing: 24) {
+                        MetricTile(
+                            label: "Inside",
+                            value: WeatherSymbols.temperature(payload.insideTemperature),
+                            detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
+                            symbol: "house"
+                        )
+                        Rectangle()
+                            .fill(theme.itemBorderColor)
+                            .frame(width: 1, height: 64)
+                        MetricTile(
+                            label: "Outside",
+                            value: WeatherSymbols.temperature(payload.outsideTemperature),
+                            detail: WeatherSymbols.condition(payload.outsideCondition),
+                            symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
+                        )
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity, alignment: .top)
         }
