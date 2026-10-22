@@ -80,7 +80,7 @@ private struct TVTabButton: View {
                 .padding(.vertical, 12)
         }
         .buttonStyle(.plain)
-        .foregroundStyle(isSelected ? theme.background : theme.body)
+        .foregroundStyle(isSelected ? theme.backgroundColor : theme.body)
         .background(
             isSelected ? theme.accentColor : theme.itemBackgroundColor,
             in: Capsule()
