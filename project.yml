@@ -83,7 +83,7 @@ targets:
     info:
       path: FamilyDashboardTV/Info.plist
       properties:
-        CFBundleDisplayName: Family Dashboard
+        CFBundleDisplayName: Family Dashboard TV
         CFBundleIcons:
           CFBundlePrimaryIcon: AppIcon
         TVTopShelfImage:

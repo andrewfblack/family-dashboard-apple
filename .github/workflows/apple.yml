@@ -53,6 +53,9 @@ jobs:
         with:
           xcode-version: "26.2"
 
+      - name: Clean derived data
+        run: rm -rf .build/ios .build/tvos
+
       - name: Build iOS app for the simulator
         run: >-
           xcodebuild
