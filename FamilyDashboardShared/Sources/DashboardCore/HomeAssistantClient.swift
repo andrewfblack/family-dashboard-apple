@@ -103,7 +103,7 @@ public actor HomeAssistantClient {
     // MARK: - Plumbing
 
     /// Build a request for the API.
-    func makeRequest(
+    public func makeRequest(
         path: String,
         authenticated: Bool = true,
         query: [URLQueryItem] = []
