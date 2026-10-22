@@ -53,6 +53,10 @@ targets:
         # homeassistant.local needs. See the README for a bare IP address.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            100.64.0.0/10:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
         NSLocalNetworkUsageDescription: "Family Dashboard connects to your Home Assistant on your local network."
     settings:
       base:
@@ -79,6 +83,10 @@ targets:
         CFBundleDisplayName: Family Dashboard
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            100.64.0.0/10:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
         NSLocalNetworkUsageDescription: "Family Dashboard connects to your Home Assistant on your local network."
     settings:
       base:
