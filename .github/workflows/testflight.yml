@@ -1,0 +1,165 @@
+name: TestFlight release
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: Upload archives to TestFlight after exporting them
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: testflight-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Archive and upload Apple apps
+    runs-on: macos-14
+    environment: app-store
+    permissions:
+      contents: read
+    env:
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "15.4"
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in APPLE_TEAM_ID APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_PRIVATE_KEY; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing GitHub Secret: $name" >&2
+              exit 1
+            fi
+          done
+
+      - name: Create App Store Connect API key file
+        shell: bash
+        run: |
+          set -euo pipefail
+          key_path="$RUNNER_TEMP/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8"
+          printf '%s' "$APP_STORE_CONNECT_PRIVATE_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
+
+      - name: Archive iOS app
+        run: >-
+          xcodebuild archive
+          -project FamilyDashboard.xcodeproj
+          -scheme FamilyDashboard
+          -configuration Release
+          -destination 'generic/platform=iOS'
+          -archivePath $RUNNER_TEMP/FamilyDashboard-iOS.xcarchive
+          DEVELOPMENT_TEAM=$APPLE_TEAM_ID
+          CODE_SIGN_STYLE=Automatic
+          -allowProvisioningUpdates
+          -authenticationKeyPath $ASC_KEY_PATH
+          -authenticationKeyID $APP_STORE_CONNECT_KEY_ID
+          -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Archive tvOS app
+        run: >-
+          xcodebuild archive
+          -project FamilyDashboard.xcodeproj
+          -scheme FamilyDashboardTV
+          -configuration Release
+          -destination 'generic/platform=tvOS'
+          -archivePath $RUNNER_TEMP/FamilyDashboard-tvOS.xcarchive
+          DEVELOPMENT_TEAM=$APPLE_TEAM_ID
+          CODE_SIGN_STYLE=Automatic
+          -allowProvisioningUpdates
+          -authenticationKeyPath $ASC_KEY_PATH
+          -authenticationKeyID $APP_STORE_CONNECT_KEY_ID
+          -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Create App Store export options
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>destination</key>
+            <string>export</string>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          PLIST
+
+      - name: Export iOS app
+        run: >-
+          xcodebuild -exportArchive
+          -archivePath $RUNNER_TEMP/FamilyDashboard-iOS.xcarchive
+          -exportPath $RUNNER_TEMP/FamilyDashboard-iOS-export
+          -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
+          -allowProvisioningUpdates
+          -authenticationKeyPath $ASC_KEY_PATH
+          -authenticationKeyID $APP_STORE_CONNECT_KEY_ID
+          -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Export tvOS app
+        run: >-
+          xcodebuild -exportArchive
+          -archivePath $RUNNER_TEMP/FamilyDashboard-tvOS.xcarchive
+          -exportPath $RUNNER_TEMP/FamilyDashboard-tvOS-export
+          -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
+          -allowProvisioningUpdates
+          -authenticationKeyPath $ASC_KEY_PATH
+          -authenticationKeyID $APP_STORE_CONNECT_KEY_ID
+          -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Upload iOS build to TestFlight
+        if: github.event_name == 'push' || inputs.upload == true
+        run: >-
+          xcrun altool --upload-app
+          --type ios
+          --file $RUNNER_TEMP/FamilyDashboard-iOS-export/FamilyDashboard.ipa
+          --apiKey $APP_STORE_CONNECT_KEY_ID
+          --apiIssuer $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Upload tvOS build to TestFlight
+        if: github.event_name == 'push' || inputs.upload == true
+        run: >-
+          xcrun altool --upload-app
+          --type tvos
+          --file $RUNNER_TEMP/FamilyDashboard-tvOS-export/FamilyDashboardTV.ipa
+          --apiKey $APP_STORE_CONNECT_KEY_ID
+          --apiIssuer $APP_STORE_CONNECT_ISSUER_ID
+
+      - name: Upload archives and exports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight-release-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/FamilyDashboard-iOS.xcarchive
+            ${{ runner.temp }}/FamilyDashboard-tvOS.xcarchive
+            ${{ runner.temp }}/FamilyDashboard-iOS-export
+            ${{ runner.temp }}/FamilyDashboard-tvOS-export
+          if-no-files-found: ignore

@@ -1,0 +1,94 @@
+name: Apple apps
+
+on:
+  push:
+    paths:
+      - "FamilyDashboard/**"
+      - "FamilyDashboardTV/**"
+      - "FamilyDashboardShared/**"
+      - "project.yml"
+      - ".github/workflows/apple.yml"
+  pull_request:
+    paths:
+      - "FamilyDashboard/**"
+      - "FamilyDashboardTV/**"
+      - "FamilyDashboardShared/**"
+      - "project.yml"
+      - ".github/workflows/apple.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: apple-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-tests:
+    name: Shared package tests
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: FamilyDashboardShared
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "15.4"
+
+      - name: Test DashboardCore and DashboardUI
+        run: swift test --configuration release
+
+  simulator-builds:
+    name: Simulator builds
+    runs-on: macos-14
+    needs: package-tests
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "15.4"
+
+      - name: Build iOS app for the simulator
+        run: >-
+          xcodebuild
+          -project FamilyDashboard.xcodeproj
+          -scheme FamilyDashboard
+          -configuration Debug
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath .build/ios
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          build
+
+      - name: Build tvOS app for the simulator
+        run: >-
+          xcodebuild
+          -project FamilyDashboard.xcodeproj
+          -scheme FamilyDashboardTV
+          -configuration Debug
+          -destination 'generic/platform=tvOS Simulator'
+          -derivedDataPath .build/tvos
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          build
+
+      - name: Upload iOS build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-derived-data
+          path: family-dashboard-apple/.build/ios/Logs
+          if-no-files-found: ignore
+
+      - name: Upload tvOS build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tvos-derived-data
+          path: family-dashboard-apple/.build/tvos/Logs
+          if-no-files-found: ignore

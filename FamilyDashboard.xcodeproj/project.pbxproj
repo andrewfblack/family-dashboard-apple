@@ -1,0 +1,521 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10B335D8E151B6A1D113663C /* TVConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2F4A3FE13A99D6EA1844ED /* TVConnectView.swift */; };
+		20BD6618BE117911C8749EDC /* DashboardUI in Frameworks */ = {isa = PBXBuildFile; productRef = B49D6306165A9B76DDB42398 /* DashboardUI */; };
+		27D39461439BFA82E8F6280A /* DashboardCore in Frameworks */ = {isa = PBXBuildFile; productRef = C575781DE18747590CFF05CB /* DashboardCore */; };
+		43BF5FF21C53BBEEC15C780E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99BE4D8CE0BBF057D4EE9D8A /* Assets.xcassets */; };
+		5FBEA7F58FECFE43EFA9DDAB /* DashboardCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8298155A70219A1805468D63 /* DashboardCore */; };
+		6C8E1A1967F536978D5FE1E5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A419C88AA3D0AA0F77B3ED92 /* RootView.swift */; };
+		6D6A0D2B9EE1AFA3EFBEE902 /* TVDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65C984B0E287B22B1BC8FF3 /* TVDashboardView.swift */; };
+		86E32EF5185A5DE239AA5E90 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1142DE2889A43C783AE5812A /* SettingsView.swift */; };
+		8D3808142D54A771E99824D1 /* ConnectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634A4D062DE229BE8BEEDE87 /* ConnectView.swift */; };
+		8FE6E2A6E39D595E6FB34330 /* FamilyDashboardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B87B6EE5C87490DD1FBC5A /* FamilyDashboardApp.swift */; };
+		A39D78ABFC1FBC011F824753 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 361ADA699F7EA3EC3437C61A /* Assets.xcassets */; };
+		BD606F65553F02A0EF80D6AB /* DashboardUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1672560739CA5C933624BA7D /* DashboardUI */; };
+		C305BA146AB038D89C81BE6C /* TVRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C09C059884713716CEB6472 /* TVRootView.swift */; };
+		D0D01969B895CB67BA802B70 /* FamilyDashboardTVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98117E5A29EDAC04549D3C8 /* FamilyDashboardTVApp.swift */; };
+		D946E0E5DD9C13E85A541D2B /* MealPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 089AE03206506B2ABD1C84DF /* MealPlanView.swift */; };
+		F11A380F0C656C03AD73F180 /* DashboardShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E90840CEB1A7903B242E1B1 /* DashboardShell.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00B87B6EE5C87490DD1FBC5A /* FamilyDashboardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyDashboardApp.swift; sourceTree = "<group>"; };
+		089AE03206506B2ABD1C84DF /* MealPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanView.swift; sourceTree = "<group>"; };
+		1142DE2889A43C783AE5812A /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		23AA523995036ABFC1143247 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		361ADA699F7EA3EC3437C61A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3E90840CEB1A7903B242E1B1 /* DashboardShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardShell.swift; sourceTree = "<group>"; };
+		4F99D8D8A29AEB0C3F1AC801 /* FamilyDashboardTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FamilyDashboardTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		634A4D062DE229BE8BEEDE87 /* ConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectView.swift; sourceTree = "<group>"; };
+		7C09C059884713716CEB6472 /* TVRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVRootView.swift; sourceTree = "<group>"; };
+		99BE4D8CE0BBF057D4EE9D8A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A419C88AA3D0AA0F77B3ED92 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		B00B842E30C2C80F4608B098 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B98117E5A29EDAC04549D3C8 /* FamilyDashboardTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyDashboardTVApp.swift; sourceTree = "<group>"; };
+		BC2F4A3FE13A99D6EA1844ED /* TVConnectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVConnectView.swift; sourceTree = "<group>"; };
+		D65C984B0E287B22B1BC8FF3 /* TVDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVDashboardView.swift; sourceTree = "<group>"; };
+		D669E48AAB385D39C9F56789 /* FamilyDashboard.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FamilyDashboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB847AC6B1C277640012C696 /* FamilyDashboardShared */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FamilyDashboardShared; path = FamilyDashboardShared; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4A6339504493EFF23D9FC1AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27D39461439BFA82E8F6280A /* DashboardCore in Frameworks */,
+				BD606F65553F02A0EF80D6AB /* DashboardUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5280F3318B2F09EE3C7666B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5FBEA7F58FECFE43EFA9DDAB /* DashboardCore in Frameworks */,
+				20BD6618BE117911C8749EDC /* DashboardUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		590F5C7954744797EA7374A0 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				FB847AC6B1C277640012C696 /* FamilyDashboardShared */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		71794D775F28A52F0666D6BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D669E48AAB385D39C9F56789 /* FamilyDashboard.app */,
+				4F99D8D8A29AEB0C3F1AC801 /* FamilyDashboardTV.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BFF3A6FC85507F01130A0F75 /* FamilyDashboardTV */ = {
+			isa = PBXGroup;
+			children = (
+				361ADA699F7EA3EC3437C61A /* Assets.xcassets */,
+				B98117E5A29EDAC04549D3C8 /* FamilyDashboardTVApp.swift */,
+				23AA523995036ABFC1143247 /* Info.plist */,
+				BC2F4A3FE13A99D6EA1844ED /* TVConnectView.swift */,
+				D65C984B0E287B22B1BC8FF3 /* TVDashboardView.swift */,
+				7C09C059884713716CEB6472 /* TVRootView.swift */,
+			);
+			path = FamilyDashboardTV;
+			sourceTree = "<group>";
+		};
+		CA3AF253954A3F2CC8B1DAB5 /* FamilyDashboard */ = {
+			isa = PBXGroup;
+			children = (
+				99BE4D8CE0BBF057D4EE9D8A /* Assets.xcassets */,
+				634A4D062DE229BE8BEEDE87 /* ConnectView.swift */,
+				3E90840CEB1A7903B242E1B1 /* DashboardShell.swift */,
+				00B87B6EE5C87490DD1FBC5A /* FamilyDashboardApp.swift */,
+				B00B842E30C2C80F4608B098 /* Info.plist */,
+				089AE03206506B2ABD1C84DF /* MealPlanView.swift */,
+				A419C88AA3D0AA0F77B3ED92 /* RootView.swift */,
+				1142DE2889A43C783AE5812A /* SettingsView.swift */,
+			);
+			path = FamilyDashboard;
+			sourceTree = "<group>";
+		};
+		FFCA8275EEBCE8C57460321A = {
+			isa = PBXGroup;
+			children = (
+				CA3AF253954A3F2CC8B1DAB5 /* FamilyDashboard */,
+				BFF3A6FC85507F01130A0F75 /* FamilyDashboardTV */,
+				590F5C7954744797EA7374A0 /* Packages */,
+				71794D775F28A52F0666D6BD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5A49BF7F5D2F01AE33CC7DD1 /* FamilyDashboardTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB736CD9D23A6E539C30B7F5 /* Build configuration list for PBXNativeTarget "FamilyDashboardTV" */;
+			buildPhases = (
+				F934031CDEC01878FD967A7E /* Sources */,
+				E118369775F379F9A6B4CFC7 /* Resources */,
+				E5280F3318B2F09EE3C7666B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FamilyDashboardTV;
+			packageProductDependencies = (
+				8298155A70219A1805468D63 /* DashboardCore */,
+				B49D6306165A9B76DDB42398 /* DashboardUI */,
+			);
+			productName = FamilyDashboardTV;
+			productReference = 4F99D8D8A29AEB0C3F1AC801 /* FamilyDashboardTV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C1DC6A4318997C480A0A636D /* FamilyDashboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BAB40433B0AD4119C3DC714C /* Build configuration list for PBXNativeTarget "FamilyDashboard" */;
+			buildPhases = (
+				775BACE51ADD5BE53C2DC009 /* Sources */,
+				2C1658AD0702DB95FC7F8EC5 /* Resources */,
+				4A6339504493EFF23D9FC1AA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FamilyDashboard;
+			packageProductDependencies = (
+				C575781DE18747590CFF05CB /* DashboardCore */,
+				1672560739CA5C933624BA7D /* DashboardUI */,
+			);
+			productName = FamilyDashboard;
+			productReference = D669E48AAB385D39C9F56789 /* FamilyDashboard.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DC660FBE4FE17500BC18061B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					5A49BF7F5D2F01AE33CC7DD1 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					C1DC6A4318997C480A0A636D = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 970B41028D96F6C7770F4DE0 /* Build configuration list for PBXProject "FamilyDashboard" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FFCA8275EEBCE8C57460321A;
+			packageReferences = (
+				49ABAF69B276DBB3B599FCF3 /* XCLocalSwiftPackageReference "FamilyDashboardShared" */,
+			);
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C1DC6A4318997C480A0A636D /* FamilyDashboard */,
+				5A49BF7F5D2F01AE33CC7DD1 /* FamilyDashboardTV */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2C1658AD0702DB95FC7F8EC5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43BF5FF21C53BBEEC15C780E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E118369775F379F9A6B4CFC7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A39D78ABFC1FBC011F824753 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		775BACE51ADD5BE53C2DC009 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D3808142D54A771E99824D1 /* ConnectView.swift in Sources */,
+				F11A380F0C656C03AD73F180 /* DashboardShell.swift in Sources */,
+				8FE6E2A6E39D595E6FB34330 /* FamilyDashboardApp.swift in Sources */,
+				D946E0E5DD9C13E85A541D2B /* MealPlanView.swift in Sources */,
+				6C8E1A1967F536978D5FE1E5 /* RootView.swift in Sources */,
+				86E32EF5185A5DE239AA5E90 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F934031CDEC01878FD967A7E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0D01969B895CB67BA802B70 /* FamilyDashboardTVApp.swift in Sources */,
+				10B335D8E151B6A1D113663C /* TVConnectView.swift in Sources */,
+				6D6A0D2B9EE1AFA3EFBEE902 /* TVDashboardView.swift in Sources */,
+				C305BA146AB038D89C81BE6C /* TVRootView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1EEEA69E29713927BCE4F8CA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Debug;
+		};
+		360AC46148F7B81270761332 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FamilyDashboardTV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.familydashboard.dashboard.tv;
+				PRODUCT_NAME = FamilyDashboardTV;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		4D2166231B40D9AEC245EFE5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Release;
+		};
+		A7485809AFC1E4DE4ECCF284 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FamilyDashboard/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.familydashboard.dashboard;
+				PRODUCT_NAME = FamilyDashboard;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D1FEEA8180B44376EDF0B459 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FamilyDashboard/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.familydashboard.dashboard;
+				PRODUCT_NAME = FamilyDashboard;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FF2E1A5713E55C271A51EC90 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FamilyDashboardTV/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.familydashboard.dashboard.tv;
+				PRODUCT_NAME = FamilyDashboardTV;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		970B41028D96F6C7770F4DE0 /* Build configuration list for PBXProject "FamilyDashboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1EEEA69E29713927BCE4F8CA /* Debug */,
+				4D2166231B40D9AEC245EFE5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BAB40433B0AD4119C3DC714C /* Build configuration list for PBXNativeTarget "FamilyDashboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1FEEA8180B44376EDF0B459 /* Debug */,
+				A7485809AFC1E4DE4ECCF284 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BB736CD9D23A6E539C30B7F5 /* Build configuration list for PBXNativeTarget "FamilyDashboardTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF2E1A5713E55C271A51EC90 /* Debug */,
+				360AC46148F7B81270761332 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		49ABAF69B276DBB3B599FCF3 /* XCLocalSwiftPackageReference "FamilyDashboardShared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = FamilyDashboardShared;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1672560739CA5C933624BA7D /* DashboardUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DashboardUI;
+		};
+		8298155A70219A1805468D63 /* DashboardCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DashboardCore;
+		};
+		B49D6306165A9B76DDB42398 /* DashboardUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DashboardUI;
+		};
+		C575781DE18747590CFF05CB /* DashboardCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DashboardCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = DC660FBE4FE17500BC18061B /* Project object */;
+}

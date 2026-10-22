@@ -1,0 +1,333 @@
+{
+  "ok": true,
+  "schema_version": 2,
+  "server_time": "2026-10-21T19:52:57+00:00",
+  "dashboard_id": "entry1",
+  "access_mode": "lan",
+  "title": "Family Dashboard",
+  "theme": {
+    "header_text": "#FFF7EA",
+    "item_header_text": "#EFB26C",
+    "body_text": "#FFF7EA",
+    "muted_text": "#CDBDA9",
+    "accent": "#E18A45",
+    "background": "#17100B",
+    "item_background": "#1F1711",
+    "selected_background": "#9B542B",
+    "selected_border": "#FFD28C",
+    "item_border": "#59483C",
+    "item_opacity": 90,
+    "background_overlay": 48
+  },
+  "capabilities": {
+    "actions": [
+      "meal_week",
+      "light_toggle",
+      "light_brightness",
+      "scene_activate",
+      "climate_temperature",
+      "climate_mode"
+    ],
+    "stream": true,
+    "background": true,
+    "theme": true,
+    "weekly_meals": true,
+    "schedule": true
+  },
+  "states": {
+    "sensor.inside": {
+      "state": "21.5",
+      "attributes": {
+        "friendly_name": "Inside",
+        "current_temperature": 21.5,
+        "humidity": 45
+      }
+    },
+    "sensor.humidity": {
+      "state": "45",
+      "attributes": {
+        "friendly_name": "Humidity"
+      }
+    },
+    "weather.home": {
+      "state": "sunny",
+      "attributes": {
+        "friendly_name": "Home",
+        "temperature": 19.2,
+        "humidity": 60,
+        "wind_speed": 8,
+        "temperature_unit": "C"
+      }
+    },
+    "input_text.meal": {
+      "state": "Tacos",
+      "attributes": {
+        "friendly_name": "Meal Plan"
+      }
+    }
+  },
+  "resolved_entities": {
+    "inside": "sensor.inside",
+    "inside_humidity": "sensor.humidity",
+    "outside": "weather.home"
+  },
+  "meal_plan": "Tacos",
+  "weekly_meal_plan": [
+    {
+      "day": "Monday",
+      "meal": "Pasta",
+      "is_today": false
+    },
+    {
+      "day": "Tuesday",
+      "meal": "Tacos",
+      "is_today": false
+    },
+    {
+      "day": "Wednesday",
+      "meal": "Tacos",
+      "is_today": true
+    },
+    {
+      "day": "Thursday",
+      "meal": "",
+      "is_today": false
+    },
+    {
+      "day": "Friday",
+      "meal": "",
+      "is_today": false
+    },
+    {
+      "day": "Saturday",
+      "meal": "",
+      "is_today": false
+    },
+    {
+      "day": "Sunday",
+      "meal": "",
+      "is_today": false
+    }
+  ],
+  "calendar_events": [
+    {
+      "title": "Soccer",
+      "start": "2026-10-21T17:00:00+00:00",
+      "all_day": false,
+      "calendar_id": "calendar.family",
+      "calendar_name": "calendar.family",
+      "color": "E87979"
+    }
+  ],
+  "today_events": [
+    {
+      "title": "Soccer",
+      "start": "2026-10-21T17:00:00+00:00",
+      "all_day": false,
+      "calendar_id": "calendar.family",
+      "calendar_name": "calendar.family",
+      "color": "E87979"
+    }
+  ],
+  "month_calendar": {
+    "title": "October 2026",
+    "year": 2026,
+    "month": 10,
+    "today": 21,
+    "days_in_month": 31,
+    "first_weekday": 4,
+    "event_days": [
+      12,
+      21,
+      31
+    ],
+    "events": [
+      {
+        "title": "Columbus Day",
+        "start": "2026-10-12",
+        "all_day": true,
+        "calendar_id": "calendar.us_holidays",
+        "calendar_name": "US Holidays",
+        "color": "E5A84B"
+      },
+      {
+        "title": "Soccer",
+        "start": "2026-10-21T17:00:00+00:00",
+        "all_day": false,
+        "calendar_id": "calendar.family",
+        "calendar_name": "calendar.family",
+        "color": "E87979"
+      },
+      {
+        "title": "Halloween",
+        "start": "2026-10-31",
+        "all_day": true,
+        "calendar_id": "calendar.us_holidays",
+        "calendar_name": "US Holidays",
+        "color": "E5A84B"
+      }
+    ]
+  },
+  "calendar_schedule": {
+    "title": "October 21",
+    "days": [
+      {
+        "date": "2026-10-21",
+        "weekday": "WED",
+        "day": 21,
+        "month": "OCT",
+        "is_today": true,
+        "is_weekend": false,
+        "events": [
+          {
+            "title": "Soccer",
+            "start": "2026-10-21T17:00:00+00:00",
+            "all_day": false,
+            "calendar_id": "calendar.family",
+            "calendar_name": "calendar.family",
+            "color": "E87979"
+          }
+        ],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-22",
+        "weekday": "THU",
+        "day": 22,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": false,
+        "events": [],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-23",
+        "weekday": "FRI",
+        "day": 23,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": false,
+        "events": [],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-24",
+        "weekday": "SAT",
+        "day": 24,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": true,
+        "events": [],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-25",
+        "weekday": "SUN",
+        "day": 25,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": true,
+        "events": [],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-26",
+        "weekday": "MON",
+        "day": 26,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": false,
+        "events": [],
+        "overflow": 0
+      },
+      {
+        "date": "2026-10-27",
+        "weekday": "TUE",
+        "day": 27,
+        "month": "OCT",
+        "is_today": false,
+        "is_weekend": false,
+        "events": [],
+        "overflow": 0
+      }
+    ],
+    "day_count": 7,
+    "events_per_day": 5
+  },
+  "background": "fall",
+  "background_url": "",
+  "background_version": "",
+  "has_uploaded_background": false,
+  "layout": "home",
+  "weather": {
+    "enabled": true,
+    "available": true,
+    "entity_id": "weather.home",
+    "name": "Home",
+    "condition": "sunny",
+    "temperature": 19.2,
+    "temperature_unit": "C",
+    "humidity": 60,
+    "pressure": null,
+    "wind_speed": 8,
+    "wind_bearing": null,
+    "visibility": null,
+    "forecast_type": "daily",
+    "forecast": [
+      {
+        "datetime": "2026-10-22T12:00:00+00:00",
+        "label": "THU",
+        "condition": "sunny",
+        "temperature": 20,
+        "templow": 11,
+        "precipitation_probability": 0,
+        "wind_speed": 5
+      }
+    ]
+  },
+  "tabs": {
+    "calendar": true,
+    "weather": true,
+    "lights": true,
+    "scenes": true,
+    "climate": true
+  },
+  "lights": [
+    {
+      "entity_id": "light.kitchen",
+      "name": "Kitchen",
+      "state": "on",
+      "brightness": 200,
+      "color_temp_kelvin": null
+    }
+  ],
+  "scenes": [
+    {
+      "entity_id": "scene.movie",
+      "name": "Movie",
+      "state": "on",
+      "brightness": null,
+      "color_temp_kelvin": null
+    }
+  ],
+  "climates": [
+    {
+      "entity_id": "climate.hall",
+      "name": "Hall",
+      "state": "heat",
+      "current_temperature": 20,
+      "temperature": 21,
+      "target_temp_low": null,
+      "target_temp_high": null,
+      "humidity": null,
+      "hvac_action": null,
+      "hvac_modes": [
+        "heat",
+        "off"
+      ],
+      "min_temp": null,
+      "max_temp": null,
+      "target_temp_step": 0.5
+    }
+  ]
+}
