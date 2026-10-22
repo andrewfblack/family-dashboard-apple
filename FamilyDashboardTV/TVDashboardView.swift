@@ -8,11 +8,15 @@ import SwiftUI
 /// how a remote is used.
 struct TVDashboardView: View {
     @Environment(DashboardViewModel.self) private var model
+    @Environment(\.dashboardTheme) private var theme
 
     var body: some View {
         VStack(spacing: 24) {
-            TVHeaderView()
-            TVTabBarView()
+            VStack(spacing: 0) {
+                TVHeaderView()
+                TVTabBarView()
+            }
+            .background(theme.itemBackgroundColor)
             ScrollView {
                 TVTabContent()
                     .padding(.horizontal, 60)
@@ -40,6 +44,8 @@ private struct TVHeaderView: View {
                 .foregroundStyle(theme.muted)
         }
         .padding(.horizontal, 60)
+        .padding(.top, 22)
+        .padding(.bottom, 12)
     }
 }
 
@@ -62,6 +68,7 @@ private struct TVTabBarView: View {
                 }
             }
             .padding(.horizontal, 60)
+            .padding(.bottom, 14)
         }
         .focusSection()
     }
@@ -76,18 +83,21 @@ private struct TVTabButton: View {
 
     var body: some View {
         Button(action: select) {
-            Label(tab.title, systemImage: tab.symbol)
-                .font(.system(size: 24, weight: .medium))
-                .padding(.horizontal, 22)
-                .padding(.vertical, 12)
+            Image(systemName: tab.symbol)
+                .font(.system(size: 28, weight: .medium))
+                .frame(width: 84, height: 64)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(tab.title)
         .foregroundStyle(isSelected ? theme.backgroundColor : theme.body)
         .background(
             isSelected ? theme.accentColor : theme.itemBackgroundColor,
-            in: Capsule()
+            in: RoundedRectangle(cornerRadius: 12)
         )
-        .overlay(Capsule().stroke(theme.itemBorderColor, lineWidth: 1))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isSelected ? theme.selectedBorderColor : theme.itemBorderColor, lineWidth: isSelected ? 2 : 1)
+        )
     }
 }
 
