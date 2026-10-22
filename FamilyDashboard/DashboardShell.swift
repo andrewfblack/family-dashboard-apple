@@ -33,7 +33,7 @@ struct DashboardShell: View {
                 TabView(selection: selection) {
                     ForEach(model.tabs) { tab in
                         TabContent(tab: tab)
-                            .tabItem { Label(tab.title, systemImage: tab.symbol) }
+                            .tabItem { Image("Tab\(tab.title)").renderingMode(.template) }
                             .tag(tab)
                     }
                 }
@@ -70,8 +70,10 @@ struct TabContent: View {
 
     var body: some View {
         let payload = model.payload
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+        ZStack {
+            BackgroundView()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
                 if let payload {
                     switch tab {
                     case .home: HomeTab(payload: payload)
@@ -101,10 +103,11 @@ struct TabContent: View {
                     }
                     .frame(maxWidth: .infinity, minHeight: 220)
                 }
+                }
+                .padding(20)
+                .frame(maxWidth: 900)
+                .frame(maxWidth: .infinity)
             }
-            .padding(20)
-            .frame(maxWidth: 900)
-            .frame(maxWidth: .infinity)
         }
         .refreshable {
             await model.refresh()
@@ -182,6 +185,8 @@ struct CalendarTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            MonthCalendarView(month: payload.monthCalendar)
+
             if sizeClass == .compact {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(payload.calendarSchedule.days) { day in
@@ -201,6 +206,47 @@ struct CalendarTab: View {
                 .scrollTargetBehavior(.viewAligned)
             }
         }
+    }
+}
+
+/// A compact month overview matching the Roku calendar's event-day view.
+struct MonthCalendarView: View {
+    @Environment(\.dashboardTheme) private var theme
+    let month: MonthCalendar
+
+    private let weekdayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+
+    var body: some View {
+        DashboardCard(month.title.isEmpty ? "Calendar" : month.title, symbol: "calendar") {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 8) {
+                ForEach(weekdayNames, id: \.self) { weekday in
+                    Text(weekday)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(theme.muted)
+                }
+                ForEach(Array(slots.enumerated()), id: \.offset) { _, day in
+                    if day == 0 {
+                        Color.clear.frame(minHeight: 30)
+                    } else {
+                        Text("\(day)")
+                            .font(.subheadline.weight(day == month.today ? .bold : .regular))
+                            .foregroundStyle(day == month.today ? theme.backgroundColor : theme.body)
+                            .frame(maxWidth: .infinity, minHeight: 30)
+                            .background(
+                                day == month.today
+                                    ? theme.accentColor
+                                    : (month.eventDays.contains(day) ? theme.selectedBackgroundColor : .clear),
+                                in: Circle()
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private var slots: [Int] {
+        Array(repeating: 0, count: max(0, month.firstWeekday))
+            + Array(1...max(1, month.daysInMonth))
     }
 }
 
