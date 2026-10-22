@@ -39,6 +39,7 @@ targets:
       path: FamilyDashboard/Info.plist
       properties:
         CFBundleDisplayName: Family Dashboard
+        ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
@@ -81,6 +82,7 @@ targets:
       path: FamilyDashboardTV/Info.plist
       properties:
         CFBundleDisplayName: Family Dashboard
+        ITSAppUsesNonExemptEncryption: false
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
           NSExceptionDomains:
