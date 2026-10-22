@@ -25,6 +25,22 @@ public struct DashboardCard<Content: View>: View {
     private let symbol: String?
     private let content: Content
 
+    private var cardBackground: Color {
+        #if os(tvOS)
+        return isFocused ? theme.backgroundColor.opacity(0.92) : theme.itemBackgroundColor
+        #else
+        return theme.itemBackgroundColor
+        #endif
+    }
+
+    private var cardBorder: Color {
+        #if os(tvOS)
+        return isFocused ? theme.selectedBorderColor : theme.itemBorderColor
+        #else
+        return theme.itemBorderColor
+        #endif
+    }
+
     /// Create a card.
     public init(_ title: String, symbol: String? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -47,24 +63,10 @@ public struct DashboardCard<Content: View>: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            #if os(tvOS)
-            isFocused ? theme.backgroundColor.opacity(0.92) : theme.itemBackgroundColor,
-            #else
-            theme.itemBackgroundColor,
-            #endif
-            in: RoundedRectangle(cornerRadius: 18)
-        )
+        .background(cardBackground, in: RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(
-                    #if os(tvOS)
-                    isFocused ? theme.selectedBorderColor : theme.itemBorderColor,
-                    #else
-                    theme.itemBorderColor,
-                    #endif
-                    lineWidth: 1
-                )
+                .stroke(cardBorder, lineWidth: 1)
         )
         #if os(tvOS)
         .focusable()
