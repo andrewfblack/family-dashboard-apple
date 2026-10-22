@@ -101,6 +101,10 @@ struct TabContent: View {
                             ProgressView()
                             Text("Connecting to Home Assistant…")
                         }
+                        Button("Forget this device and pair again", role: .destructive) {
+                            Task { await model.unpair() }
+                        }
+                        .buttonStyle(.bordered)
                     }
                     .frame(maxWidth: .infinity, minHeight: 220)
                 }
