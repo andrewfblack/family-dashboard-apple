@@ -133,6 +133,14 @@ public struct EventRow: View {
 
     private let event: CalendarEvent
 
+    private var timeColumnWidth: CGFloat {
+        #if os(tvOS)
+        return 124
+        #else
+        return 76
+        #endif
+    }
+
     /// Create a row.
     public init(event: CalendarEvent) {
         self.event = event
@@ -144,7 +152,7 @@ public struct EventRow: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(theme.muted)
                 .lineLimit(1)
-                .frame(width: 124, alignment: .leading)
+                .frame(width: timeColumnWidth, alignment: .leading)
             RoundedRectangle(cornerRadius: 2)
                 .fill(Color(hex: event.color ?? "E5A84B"))
                 .frame(width: 4, height: 22)
