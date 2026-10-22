@@ -53,8 +53,17 @@ struct BackgroundView: View {
                     Image("SummerBackground").resizable().aspectRatio(contentMode: .fill)
                 case "custom_url":
                     if let url = URL(string: payload.backgroundURL) {
-                        AsyncImage(url: url) { image in
-                            image.resizable().aspectRatio(contentMode: .fill)
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case let .success(image):
+                                image.resizable().aspectRatio(contentMode: .fill)
+                            case .failure:
+                                EmptyView()
+                            case .empty:
+                                ProgressView()
+                            @unknown default:
+                                EmptyView()
+                            }
                         }
                     }
                 default:
