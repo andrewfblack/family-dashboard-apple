@@ -1,6 +1,7 @@
 import DashboardCore
 import DashboardUI
 import SwiftUI
+import UIKit
 
 /// The screen the app shows first: pairing, or the dashboard.
 struct RootView: View {
@@ -38,6 +39,7 @@ struct RootView: View {
 /// The background the administrator chose.
 struct BackgroundView: View {
     @Environment(DashboardViewModel.self) private var model
+    @State private var uploadedImage: Image?
 
     var body: some View {
         let payload = model.payload
@@ -70,6 +72,10 @@ struct BackgroundView: View {
                             }
                         }
                     }
+                case "uploaded":
+                    if let uploadedImage {
+                        uploadedImage.resizable().aspectRatio(contentMode: .fill)
+                    }
                 default:
                     EmptyView()
                 }
@@ -77,5 +83,24 @@ struct BackgroundView: View {
         }
         .opacity(0.9)
         .ignoresSafeArea()
+        .task(id: model.payload?.backgroundVersion ?? "") {
+            await loadUploadedBackground()
+        }
+    }
+
+    private func loadUploadedBackground() async {
+        guard let payload = model.payload,
+              payload.background == "uploaded",
+              payload.hasUploadedBackground,
+              let request = await model.backgroundRequest(),
+              let (data, response) = try? await URLSession.shared.data(for: request),
+              let http = response as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode),
+              let image = UIImage(data: data)
+        else {
+            uploadedImage = nil
+            return
+        }
+        uploadedImage = Image(uiImage: image)
     }
 }

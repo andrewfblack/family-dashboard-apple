@@ -171,6 +171,13 @@ public final class DashboardViewModel {
         errorMessage = nil
     }
 
+    /// Build the authenticated request for an uploaded dashboard background.
+    public func backgroundRequest() async -> URLRequest? {
+        try? await session.homeAssistant.makeRequest(
+            path: "/api/family_dashboard/device/background"
+        )
+    }
+
     // MARK: - Live updates
 
     /// Open the live update stream and keep it open.
