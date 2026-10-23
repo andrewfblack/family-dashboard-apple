@@ -145,21 +145,41 @@ jobs:
 
       - name: Upload iOS build to TestFlight
         if: github.event_name == 'push' || inputs.upload == true
-        run: >-
-          xcrun altool --upload-app
-          --type ios
-          --file $RUNNER_TEMP/FamilyDashboard-iOS-export/FamilyDashboard.ipa
-          --apiKey $APP_STORE_CONNECT_KEY_ID
-          --apiIssuer $APP_STORE_CONNECT_ISSUER_ID
+        shell: bash
+        run: |
+          set -o pipefail
+          log="$RUNNER_TEMP/ios-upload.log"
+          set +e
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$RUNNER_TEMP/FamilyDashboard-iOS-export/FamilyDashboard.ipa" \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" 2>&1 | tee "$log"
+          status=${PIPESTATUS[0]}
+          set -e
+          if [[ "$status" -ne 0 ]] || grep -Eq 'UPLOAD FAILED|Validation failed|Failed to upload package' "$log"; then
+            echo "App Store Connect rejected the iOS upload" >&2
+            exit 1
+          fi
 
       - name: Upload tvOS build to TestFlight
         if: github.event_name == 'push' || inputs.upload == true
-        run: >-
-          xcrun altool --upload-app
-          --type tvos
-          --file $RUNNER_TEMP/FamilyDashboard-tvOS-export/FamilyDashboardTV.ipa
-          --apiKey $APP_STORE_CONNECT_KEY_ID
-          --apiIssuer $APP_STORE_CONNECT_ISSUER_ID
+        shell: bash
+        run: |
+          set -o pipefail
+          log="$RUNNER_TEMP/tvos-upload.log"
+          set +e
+          xcrun altool --upload-app \
+            --type tvos \
+            --file "$RUNNER_TEMP/FamilyDashboard-tvOS-export/FamilyDashboardTV.ipa" \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" 2>&1 | tee "$log"
+          status=${PIPESTATUS[0]}
+          set -e
+          if [[ "$status" -ne 0 ]] || grep -Eq 'UPLOAD FAILED|Validation failed|Failed to upload package' "$log"; then
+            echo "App Store Connect rejected the tvOS upload" >&2
+            exit 1
+          fi
 
       - name: Upload archives and exports
         if: always()
