@@ -30,11 +30,9 @@ struct DashboardShell: View {
                     TabContent(tab: model.selectedTab)
                 }
             } else {
-                TabView(selection: selection) {
-                    ForEach(model.tabs) { tab in
-                        TabContent(tab: tab)
-                            .tabItem { Image("Tab\(tab.title)").renderingMode(.template) }
-                            .tag(tab)
+                TabContent(tab: model.selectedTab)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        IOSScrollableTabBar()
                     }
                 }
             }
@@ -58,6 +56,58 @@ struct DashboardShell: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+    }
+}
+
+/// A compact, horizontally scrollable tab rail for iPhone.
+///
+/// SwiftUI's TabView creates a More menu once there are more than five tabs.
+/// Keeping the rail in the app gives every enabled dashboard tab a direct,
+/// swipeable destination instead.
+private struct IOSScrollableTabBar: View {
+    @Environment(DashboardViewModel.self) private var model
+    @Environment(\.dashboardTheme) private var theme
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(model.tabs) { tab in
+                    Button {
+                        model.selectedTab = tab
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image("Tab\(tab.title)")
+                                .renderingMode(.template)
+                                .font(.system(size: 21, weight: .medium))
+                            Text(tab.title)
+                                .font(.caption2.weight(.medium))
+                        }
+                        .foregroundStyle(
+                            model.selectedTab == tab ? theme.accentColor : theme.body
+                        )
+                        .frame(minWidth: 70, minHeight: 52)
+                        .padding(.horizontal, 4)
+                        .background(
+                            model.selectedTab == tab
+                                ? theme.selectedBackgroundColor
+                                : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 14)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tab.title)
+                    .accessibilityAddTraits(model.selectedTab == tab ? .isSelected : [])
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(theme.itemBorderColor)
+                .frame(height: 1)
         }
     }
 }
