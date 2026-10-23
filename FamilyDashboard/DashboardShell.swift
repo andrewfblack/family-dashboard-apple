@@ -121,44 +121,46 @@ struct TabContent: View {
         let payload = model.payload
         ZStack {
             BackgroundView()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                DashboardHeader(title: payload?.title ?? "Family Dashboard")
-                if let payload {
-                    switch tab {
-                    case .home: HomeTab(payload: payload)
-                    case .calendar: CalendarTab(payload: payload)
-                    case .weather: WeatherTab(payload: payload)
-                    case .lights: LightsTab(payload: payload)
-                    case .scenes: ScenesTab(payload: payload)
-                    case .climate: ClimateTab(payload: payload)
-                    }
-                } else {
-                    VStack(spacing: 16) {
-                        if let errorMessage = model.errorMessage {
-                            Text(errorMessage)
-                                .multilineTextAlignment(.center)
-                            Button("Retry") {
-                                Task { await model.refresh() }
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        DashboardHeader(title: payload?.title ?? "Family Dashboard")
+                        if let payload {
+                            switch tab {
+                            case .home: HomeTab(payload: payload)
+                            case .calendar: CalendarTab(payload: payload)
+                            case .weather: WeatherTab(payload: payload)
+                            case .lights: LightsTab(payload: payload)
+                            case .scenes: ScenesTab(payload: payload)
+                            case .climate: ClimateTab(payload: payload)
                             }
-                            .buttonStyle(.borderedProminent)
                         } else {
-                            ProgressView()
-                            Text("Connecting to Home Assistant…")
+                            VStack(spacing: 16) {
+                                if let errorMessage = model.errorMessage {
+                                    Text(errorMessage)
+                                        .multilineTextAlignment(.center)
+                                    Button("Retry") {
+                                        Task { await model.refresh() }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                } else {
+                                    ProgressView()
+                                    Text("Connecting to Home Assistant…")
+                                }
+                                Button("Forget this device and pair again", role: .destructive) {
+                                    Task { await model.unpair() }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 220)
                         }
-                        Button("Forget this device and pair again", role: .destructive) {
-                            Task { await model.unpair() }
-                        }
-                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 220)
+                    .padding(20)
+                    .frame(width: geometry.size.width, alignment: .leading)
                 }
-                }
-                .padding(20)
-                .frame(maxWidth: 900)
-                .frame(maxWidth: .infinity)
+                .background(Color.clear)
             }
-            .background(Color.clear)
         }
         .refreshable {
             await model.refresh()
@@ -177,10 +179,14 @@ struct DashboardHeader: View {
             Text(title)
                 .font(.title2.weight(.bold))
                 .foregroundStyle(theme.header)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             Spacer()
             Text(Date.now.formatted(date: .complete, time: .shortened))
                 .font(.caption)
                 .foregroundStyle(theme.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
         }
         .padding(.horizontal, 4)
     }
@@ -260,21 +266,31 @@ struct HomeTab: View {
     @ViewBuilder
     private var climateCard: some View {
             DashboardCard("Climate", symbol: "thermometer.medium") {
-                HStack(spacing: 16) {
-                    MetricTile(
-                        label: "Inside",
-                        value: WeatherSymbols.temperature(payload.insideTemperature),
-                        detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
-                        symbol: "house"
-                    )
-                    MetricTile(
-                        label: "Outside",
-                        value: WeatherSymbols.temperature(payload.outsideTemperature),
-                        detail: WeatherSymbols.condition(payload.outsideCondition),
-                        symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
-                    )
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 16) {
+                        climateMetrics
+                    }
+                    VStack(alignment: .leading, spacing: 12) {
+                        climateMetrics
+                    }
                 }
             }
+    }
+
+    @ViewBuilder
+    private var climateMetrics: some View {
+        MetricTile(
+            label: "Inside",
+            value: WeatherSymbols.temperature(payload.insideTemperature),
+            detail: payload.insideHumidity.map { "\(Int($0))% humidity" },
+            symbol: "house"
+        )
+        MetricTile(
+            label: "Outside",
+            value: WeatherSymbols.temperature(payload.outsideTemperature),
+            detail: WeatherSymbols.condition(payload.outsideCondition),
+            symbol: WeatherSymbols.symbol(for: payload.outsideCondition)
+        )
     }
 
 }
@@ -353,6 +369,7 @@ struct MonthCalendarView: View {
 
 /// The current conditions and the forecast.
 struct WeatherTab: View {
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let payload: DashboardPayload
 
     var body: some View {
@@ -385,9 +402,17 @@ struct WeatherTab: View {
                     "\((payload.weather.forecastType ?? "daily").capitalized) forecast",
                     symbol: "chart.bar"
                 ) {
-                    HStack(spacing: 12) {
-                        ForEach(payload.weather.forecast) { forecast in
-                            ForecastTile(forecast: forecast)
+                    if sizeClass == .compact {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 12) {
+                            ForEach(payload.weather.forecast) { forecast in
+                                ForecastTile(forecast: forecast)
+                            }
+                        }
+                    } else {
+                        HStack(spacing: 12) {
+                            ForEach(payload.weather.forecast) { forecast in
+                                ForecastTile(forecast: forecast)
+                            }
                         }
                     }
                 }
@@ -402,7 +427,7 @@ struct LightsTab: View {
     let payload: DashboardPayload
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 220))], spacing: 16) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160))], spacing: 16) {
             ForEach(payload.lights) { light in
                 LightTile(light: light) { action in
                     Task { await model.run(action) }
@@ -418,7 +443,7 @@ struct ScenesTab: View {
     let payload: DashboardPayload
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 200))], spacing: 16) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160))], spacing: 16) {
             ForEach(payload.scenes) { scene in
                 SceneTile(scene: scene) { action in
                     Task { await model.run(action) }
@@ -431,14 +456,28 @@ struct ScenesTab: View {
 /// The thermostats that may be adjusted.
 struct ClimateTab: View {
     @Environment(DashboardViewModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let payload: DashboardPayload
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 320))], spacing: 16) {
-            ForEach(payload.climates) { climate in
-                ClimateTile(climate: climate) { action in
-                    Task { await model.run(action) }
+        Group {
+            if sizeClass == .compact {
+                LazyVStack(spacing: 16) {
+                    climateTiles
                 }
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 320))], spacing: 16) {
+                    climateTiles
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var climateTiles: some View {
+        ForEach(payload.climates) { climate in
+            ClimateTile(climate: climate) { action in
+                Task { await model.run(action) }
             }
         }
     }
