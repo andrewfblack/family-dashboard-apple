@@ -154,7 +154,6 @@ struct TabContent: View {
                             }
                             .frame(maxWidth: .infinity, minHeight: 220)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(20)
                     .frame(width: geometry.size.width, alignment: .leading)
