@@ -34,7 +34,6 @@ struct DashboardShell: View {
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         IOSScrollableTabBar()
                     }
-                }
             }
         }
         .toolbar {
