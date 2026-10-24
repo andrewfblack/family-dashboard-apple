@@ -40,50 +40,64 @@ struct BackgroundView: View {
     var body: some View {
         let payload = model.payload
         let theme = model.theme
-        ZStack {
-            theme.backgroundColor
-                .ignoresSafeArea()
-            if let payload {
-                switch payload.background {
-                case "fall":
-                    Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
-                case "winter":
-                    Image("WinterBackground").resizable().aspectRatio(contentMode: .fill)
-                case "spring":
-                    Image("SpringBackground").resizable().aspectRatio(contentMode: .fill)
-                case "summer":
-                    Image("SummerBackground").resizable().aspectRatio(contentMode: .fill)
-                case "custom_url":
-                    if let url = URL(string: payload.backgroundURL) {
-                        AsyncImage(url: url) { phase in
-                            switch phase {
-                            case let .success(image):
-                                image.resizable().aspectRatio(contentMode: .fill)
-                            case .failure:
-                                EmptyView()
-                            case .empty:
-                                ProgressView()
-                            @unknown default:
-                                EmptyView()
+        theme.backgroundColor
+            .overlay {
+                if let payload {
+                    switch payload.background {
+                    case "fall":
+                        filledBackground(Image("FallBackground"))
+                    case "winter":
+                        filledBackground(Image("WinterBackground"))
+                    case "spring":
+                        filledBackground(Image("SpringBackground"))
+                    case "summer":
+                        filledBackground(Image("SummerBackground"))
+                    case "custom_url":
+                        if let url = URL(string: payload.backgroundURL) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case let .success(image):
+                                    filledBackground(image)
+                                case .failure:
+                                    EmptyView()
+                                case .empty:
+                                    ProgressView()
+                                @unknown default:
+                                    EmptyView()
+                                }
                             }
                         }
+                    case "uploaded":
+                        if let uploadedImage {
+                            filledBackground(uploadedImage)
+                        } else {
+                            filledBackground(Image("FallBackground"))
+                        }
+                    default:
+                        filledBackground(Image("FallBackground"))
                     }
-                case "uploaded":
-                    if let uploadedImage {
-                        uploadedImage.resizable().aspectRatio(contentMode: .fill)
-                    } else {
-                        Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
-                    }
-                default:
-                    Image("FallBackground").resizable().aspectRatio(contentMode: .fill)
                 }
             }
-        }
-        .opacity(0.9)
-        .ignoresSafeArea()
-        .task(id: model.payload?.backgroundVersion ?? "") {
-            await loadUploadedBackground()
-        }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
+            .ignoresSafeArea()
+            .opacity(0.9)
+            .task(id: model.payload?.backgroundVersion ?? "") {
+                await loadUploadedBackground()
+            }
+    }
+
+    /// Draw a photo so it covers the screen without becoming the layout size.
+    ///
+    /// A resizable fill image reports its pixel size. Inside a stack that size
+    /// pushes the cards off a portrait phone. An overlay keeps the photo visual
+    /// only.
+    private func filledBackground(_ image: Image) -> some View {
+        image
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
     }
 
     private func loadUploadedBackground() async {

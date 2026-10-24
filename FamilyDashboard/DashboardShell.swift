@@ -29,32 +29,43 @@ struct DashboardShell: View {
                 } detail: {
                     TabContent(tab: model.selectedTab)
                 }
+                .toolbar { dashboardToolbar }
             } else {
-                TabContent(tab: model.selectedTab)
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        IOSScrollableTabBar()
-                    }
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task { await model.refresh() }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .disabled(model.isLoading)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showingSettings = true
-                } label: {
-                    Image(systemName: "gearshape")
+                NavigationStack {
+                    TabContent(tab: model.selectedTab)
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            IOSScrollableTabBar()
+                        }
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbarBackground(.hidden, for: .navigationBar)
+                        .toolbarColorScheme(.dark, for: .navigationBar)
+                        .toolbar { dashboardToolbar }
                 }
             }
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+    }
+
+    /// Refresh and settings. These only appear inside a navigation container,
+    /// so the compact iPhone path has to provide one.
+    @ToolbarContentBuilder
+    private var dashboardToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                Task { await model.refresh() }
+            } label: {
+                Image(systemName: "arrow.clockwise")
+            }
+            .disabled(model.isLoading)
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+            }
         }
     }
 }
@@ -119,51 +130,42 @@ struct TabContent: View {
 
     var body: some View {
         let payload = model.payload
-        GeometryReader { geometry in
-            ZStack {
-                BackgroundView()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        DashboardHeader(title: payload?.title ?? "Family Dashboard")
-                        if let payload {
-                            switch tab {
-                            case .home: HomeTab(payload: payload)
-                            case .calendar: CalendarTab(payload: payload)
-                            case .weather: WeatherTab(payload: payload)
-                            case .lights: LightsTab(payload: payload)
-                            case .scenes: ScenesTab(payload: payload)
-                            case .climate: ClimateTab(payload: payload)
-                            case .security: SecurityTab(payload: payload)
-                            }
-                        } else {
-                            VStack(spacing: 16) {
-                                if let errorMessage = model.errorMessage {
-                                    Text(errorMessage)
-                                        .multilineTextAlignment(.center)
-                                    Button("Retry") {
-                                        Task { await model.refresh() }
-                                    }
-                                    .buttonStyle(.borderedProminent)
-                                } else {
-                                    ProgressView()
-                                    Text("Connecting to Home Assistant…")
-                                }
-                                Button("Forget this device and pair again", role: .destructive) {
-                                    Task { await model.unpair() }
-                                }
-                                .buttonStyle(.bordered)
-                            }
-                            .frame(maxWidth: .infinity, minHeight: 220)
-                        }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                DashboardHeader(title: payload?.title ?? "Family Dashboard")
+                if let payload {
+                    switch tab {
+                    case .home: HomeTab(payload: payload)
+                    case .calendar: CalendarTab(payload: payload)
+                    case .weather: WeatherTab(payload: payload)
+                    case .lights: LightsTab(payload: payload)
+                    case .scenes: ScenesTab(payload: payload)
+                    case .climate: ClimateTab(payload: payload)
+                    case .security: SecurityTab(payload: payload)
                     }
-                    .padding(20)
-                    .frame(
-                        width: geometry.size.width,
-                        alignment: .leading
-                    )
+                } else {
+                    VStack(spacing: 16) {
+                        if let errorMessage = model.errorMessage {
+                            Text(errorMessage)
+                                .multilineTextAlignment(.center)
+                            Button("Retry") {
+                                Task { await model.refresh() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else {
+                            ProgressView()
+                            Text("Connecting to Home Assistant…")
+                        }
+                        Button("Forget this device and pair again", role: .destructive) {
+                            Task { await model.unpair() }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 220)
                 }
-                .background(Color.clear)
             }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .refreshable {
             await model.refresh()
