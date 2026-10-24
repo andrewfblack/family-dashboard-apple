@@ -119,9 +119,9 @@ struct TabContent: View {
 
     var body: some View {
         let payload = model.payload
-        ZStack {
-            BackgroundView()
-            GeometryReader { geometry in
+        GeometryReader { geometry in
+            ZStack {
+                BackgroundView()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         DashboardHeader(title: payload?.title ?? "Family Dashboard")
