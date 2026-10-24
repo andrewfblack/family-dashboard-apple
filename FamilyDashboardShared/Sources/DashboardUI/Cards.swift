@@ -264,6 +264,12 @@ public struct ForecastTile: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .padding(12)
+        .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(theme.itemBorderColor, lineWidth: 1)
+        )
     }
 }
 
@@ -301,10 +307,13 @@ public struct LightTile: View {
             if light.isOn {
                 HStack(spacing: 8) {
                     ForEach([25, 50, 75, 100], id: \.self) { percent in
-                        Button("\(percent)%") {
+                        Button {
                             action(.lightBrightness(entityID: light.entityID, percent: percent))
+                        } label: {
+                            Image(systemName: brightnessSymbol(percent))
+                                .frame(minWidth: 30, minHeight: 30)
                         }
-                        .font(.caption)
+                        .accessibilityLabel("Brightness \(percent) percent")
                         .buttonStyle(.bordered)
                     }
                 }
@@ -317,6 +326,15 @@ public struct LightTile: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(theme.itemBorderColor, lineWidth: 1)
         )
+    }
+
+    private func brightnessSymbol(_ percent: Int) -> String {
+        switch percent {
+        case 25: return "lightbulb.min"
+        case 50: return "lightbulb.min.fill"
+        case 75: return "lightbulb"
+        default: return "lightbulb.fill"
+        }
     }
 }
 
@@ -409,10 +427,13 @@ public struct ClimateTile: View {
             }
             HStack(spacing: 8) {
                 ForEach(climate.hvacModes, id: \.self) { mode in
-                    Button(mode.replacingOccurrences(of: "_", with: " ")) {
+                    Button {
                         action(.climateMode(entityID: climate.entityID, mode: mode))
+                    } label: {
+                        Image(systemName: WeatherSymbols.symbol(forMode: mode))
+                            .frame(minWidth: 34, minHeight: 34)
                     }
-                    .font(.caption)
+                    .accessibilityLabel(mode.replacingOccurrences(of: "_", with: " "))
                     .buttonStyle(.borderedProminent)
                     .tint(climate.state == mode ? theme.accentColor : theme.itemBorderColor)
                 }
@@ -425,6 +446,34 @@ public struct ClimateTile: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(theme.itemBorderColor, lineWidth: 1)
         )
+    }
+}
+
+/// Tomorrow's agenda, used in place of the monthly calendar on Home.
+public struct TomorrowEventsCard: View {
+    @Environment(\.dashboardTheme) private var theme
+    public let payload: DashboardPayload
+
+    public init(payload: DashboardPayload) {
+        self.payload = payload
+    }
+
+    public var body: some View {
+        DashboardCard("Tomorrow", symbol: "calendar.badge.clock") {
+            if let tomorrow = payload.calendarSchedule.days.first(where: { !$0.isToday }) {
+                if tomorrow.events.isEmpty {
+                    Text("No events tomorrow")
+                        .foregroundStyle(theme.muted)
+                } else {
+                    ForEach(tomorrow.events) { event in
+                        EventRow(event: event)
+                    }
+                }
+            } else {
+                Text("No events tomorrow")
+                    .foregroundStyle(theme.muted)
+            }
+        }
     }
 }
 #endif

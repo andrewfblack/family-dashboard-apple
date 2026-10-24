@@ -87,9 +87,14 @@ private struct IOSScrollableTabBar: View {
                         model.selectedTab = tab
                     } label: {
                         VStack(spacing: 4) {
-                            Image("Tab\(tab.title)")
-                                .renderingMode(.template)
-                                .font(.system(size: 21, weight: .medium))
+                            if tab == .security {
+                                Image(systemName: tab.symbol)
+                                    .font(.system(size: 21, weight: .medium))
+                            } else {
+                                Image("Tab\(tab.title)")
+                                    .renderingMode(.template)
+                                    .font(.system(size: 21, weight: .medium))
+                            }
                             Text(tab.title)
                                 .font(.caption2.weight(.medium))
                         }
@@ -211,7 +216,7 @@ struct HomeTab: View {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(alignment: .leading, spacing: 16) {
                         todayCard
-                        MonthCalendarView(month: payload.monthCalendar)
+                        TomorrowEventsCard(payload: payload)
                     }
                     VStack(alignment: .leading, spacing: 16) {
                         mealCard
@@ -221,7 +226,7 @@ struct HomeTab: View {
             } else {
                 VStack(alignment: .leading, spacing: 16) {
                     todayCard
-                    MonthCalendarView(month: payload.monthCalendar)
+                    TomorrowEventsCard(payload: payload)
                     mealCard
                     climateCard
                 }

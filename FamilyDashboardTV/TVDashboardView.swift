@@ -143,40 +143,35 @@ struct TVHomeTab: View {
     @Environment(\.dashboardTheme) private var theme
     let payload: DashboardPayload
     @State private var showingAllTodayEvents = false
-    @State private var showingWeeklyMeals = false
+        @State private var showingWeeklyMeals = false
 
     var body: some View {
         HStack(alignment: .top, spacing: 22) {
-            DashboardCard(
-                "Today's Calendar",
-                symbol: "calendar",
-                onActivate: { showingAllTodayEvents.toggle() }
-            ) {
-                VStack(alignment: .leading, spacing: 16) {
-                    let events = showingAllTodayEvents ? payload.todayEvents : payload.calendarEvents
-                    if events.isEmpty {
-                        Text("No events today")
-                            .font(.title3)
-                            .foregroundStyle(theme.muted)
-                    } else {
-                        ForEach(events) { event in
-                            EventRow(event: event)
+            VStack(alignment: .leading, spacing: 22) {
+                DashboardCard(
+                    "Today's Calendar",
+                    symbol: "calendar",
+                    onActivate: { showingAllTodayEvents.toggle() }
+                ) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        let events = showingAllTodayEvents ? payload.todayEvents : payload.calendarEvents
+                        if events.isEmpty {
+                            Text("No events today")
+                                .font(.title3)
+                                .foregroundStyle(theme.muted)
+                        } else {
+                            ForEach(events) { event in
+                                EventRow(event: event)
+                            }
+                        }
+                        if !payload.todayEvents.isEmpty {
+                            Text(showingAllTodayEvents ? "Select to show fewer events" : "Select to show all events")
+                                .font(.caption)
+                                .foregroundStyle(theme.muted)
                         }
                     }
-                    if !payload.todayEvents.isEmpty {
-                        Text(showingAllTodayEvents ? "Select to show fewer events" : "Select to show all events")
-                            .font(.caption)
-                            .foregroundStyle(theme.muted)
-                    }
-                    Divider().overlay(theme.itemBorderColor)
-                    HStack {
-                        Text(payload.monthCalendar.title.isEmpty ? "Calendar" : payload.monthCalendar.title)
-                            .font(.headline)
-                            .foregroundStyle(theme.itemHeader)
-                        Spacer()
-                    }
-                    TVMonthCalendarGrid(month: payload.monthCalendar)
                 }
+                TomorrowEventsCard(payload: payload)
             }
             .frame(maxWidth: .infinity, alignment: .top)
 
@@ -280,6 +275,10 @@ struct TVCalendarTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
+            DashboardCard(payload.monthCalendar.title.isEmpty ? "Calendar" : payload.monthCalendar.title, symbol: "calendar") {
+                TVMonthCalendarGrid(month: payload.monthCalendar)
+            }
+
             GeometryReader { proxy in
                 let spacing: CGFloat = 18
                 let cardWidth = max(220, (proxy.size.width - (spacing * 4)) / 5)
