@@ -14,6 +14,8 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
     case scenes
     /// The thermostats that may be adjusted.
     case climate
+    /// Security controls and family presence.
+    case security
 
     public var id: String { rawValue }
 
@@ -26,6 +28,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .lights: return "Lights"
         case .scenes: return "Scenes"
         case .climate: return "Climate"
+        case .security: return "Security"
         }
     }
 
@@ -38,6 +41,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .lights: return "lightbulb.fill"
         case .scenes: return "sparkles"
         case .climate: return "thermometer.medium"
+        case .security: return "lock.shield.fill"
         }
     }
 
@@ -52,6 +56,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .lights: return tabs.lights
         case .scenes: return tabs.scenes
         case .climate: return tabs.climate
+        case .security: return tabs.security
         }
     }
 

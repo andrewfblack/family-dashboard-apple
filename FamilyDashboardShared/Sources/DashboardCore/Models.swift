@@ -516,19 +516,23 @@ public struct Tabs: Codable, Hashable, Sendable {
     public var scenes: Bool
     /// Whether the climate tab is shown.
     public var climate: Bool
+    /// Whether the security tab is shown.
+    public var security: Bool
 
     public init(
         calendar: Bool = true,
         weather: Bool = true,
         lights: Bool = true,
         scenes: Bool = true,
-        climate: Bool = true
+        climate: Bool = true,
+        security: Bool = false
     ) {
         self.calendar = calendar
         self.weather = weather
         self.scenes = scenes
         self.lights = lights
         self.climate = climate
+        self.security = security
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -537,7 +541,96 @@ public struct Tabs: Codable, Hashable, Sendable {
         case lights
         case scenes
         case climate
+        case security
     }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = Tabs()
+        calendar = try container.decodeIfPresent(Bool.self, forKey: .calendar) ?? defaults.calendar
+        weather = try container.decodeIfPresent(Bool.self, forKey: .weather) ?? defaults.weather
+        lights = try container.decodeIfPresent(Bool.self, forKey: .lights) ?? defaults.lights
+        scenes = try container.decodeIfPresent(Bool.self, forKey: .scenes) ?? defaults.scenes
+        climate = try container.decodeIfPresent(Bool.self, forKey: .climate) ?? defaults.climate
+        security = try container.decodeIfPresent(Bool.self, forKey: .security) ?? defaults.security
+    }
+}
+
+/// A security control exposed by the dashboard server.
+public struct SecurityItem: Codable, Hashable, Identifiable, Sendable {
+    public var entityID: String
+    public var name: String
+    public var state: String
+    public var kind: String
+
+    public var id: String { entityID }
+
+    public init(entityID: String = "", name: String = "", state: String = "unknown", kind: String = "alarm") {
+        self.entityID = entityID
+        self.name = name
+        self.state = state
+        self.kind = kind
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case entityID = "entity_id"
+        case name
+        case state
+        case kind
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entityID = try container.decodeIfPresent(String.self, forKey: .entityID) ?? ""
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        state = try container.decodeIfPresent(String.self, forKey: .state) ?? "unknown"
+        kind = try container.decodeIfPresent(String.self, forKey: .kind) ?? "alarm"
+    }
+}
+
+/// One family member's presence state.
+public struct FamilyPresence: Codable, Hashable, Identifiable, Sendable {
+    public var name: String
+    public var home: Bool
+
+    public var id: String { name }
+
+    public init(name: String = "", home: Bool = false) {
+        self.name = name
+        self.home = home
+    }
+}
+
+/// Security controls and family presence.
+public struct SecurityData: Codable, Hashable, Sendable {
+    public var garageDoors: [SecurityItem]
+    public var locks: [SecurityItem]
+    public var alarm: SecurityItem?
+    public var family: [FamilyPresence]
+
+    public init(garageDoors: [SecurityItem] = [], locks: [SecurityItem] = [], alarm: SecurityItem? = nil, family: [FamilyPresence] = []) {
+        self.garageDoors = garageDoors
+        self.locks = locks
+        self.alarm = alarm
+        self.family = family
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case garageDoors = "garage_doors"
+        case locks
+        case alarm
+        case family
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        garageDoors = try container.decodeIfPresent([SecurityItem].self, forKey: .garageDoors) ?? []
+        locks = try container.decodeIfPresent([SecurityItem].self, forKey: .locks) ?? []
+        alarm = try container.decodeIfPresent(SecurityItem.self, forKey: .alarm)
+        family = try container.decodeIfPresent([FamilyPresence].self, forKey: .family) ?? []
+    }
+
+    public var items: [SecurityItem] { garageDoors + locks + (alarm.map { [$0] } ?? []) }
 }
 
 /// A light the dashboard may control.
@@ -741,6 +834,8 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
     public var scenes: [SceneCard]
     /// The thermostats.
     public var climates: [ClimateCard]
+    /// Optional security controls and presence data.
+    public var security: SecurityData
     /// The identifier of the device that asked.
     public var deviceID: String?
 
@@ -771,6 +866,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         lights: [LightCard] = [],
         scenes: [SceneCard] = [],
         climates: [ClimateCard] = [],
+        security: SecurityData = SecurityData(),
         deviceID: String? = nil
     ) {
         self.ok = ok
@@ -799,6 +895,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         self.lights = lights
         self.scenes = scenes
         self.climates = climates
+        self.security = security
         self.deviceID = deviceID
     }
 
@@ -829,6 +926,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         case lights
         case scenes
         case climates
+        case security
         case deviceID = "device_id"
     }
 
@@ -866,6 +964,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         lights = try container.decodeIfPresent([LightCard].self, forKey: .lights) ?? []
         scenes = try container.decodeIfPresent([SceneCard].self, forKey: .scenes) ?? []
         climates = try container.decodeIfPresent([ClimateCard].self, forKey: .climates) ?? []
+        security = try container.decodeIfPresent(SecurityData.self, forKey: .security) ?? defaults.security
         deviceID = try container.decodeIfPresent(String.self, forKey: .deviceID)
     }
 }

@@ -17,6 +17,9 @@ public enum DashboardAction: Hashable, Sendable {
     case climateTemperature(entityID: String, temperature: Double)
     /// Set the mode of a thermostat.
     case climateMode(entityID: String, mode: String)
+    case securityCoverToggle(entityID: String)
+    case securityLockToggle(entityID: String)
+    case securityAlarmCommand(entityID: String, command: String)
 
     /// The name the server knows this action by.
     public var name: String {
@@ -27,6 +30,9 @@ public enum DashboardAction: Hashable, Sendable {
         case .sceneActivate: return "scene_activate"
         case .climateTemperature: return "climate_temperature"
         case .climateMode: return "climate_mode"
+        case .securityCoverToggle: return "security_cover_toggle"
+        case .securityLockToggle: return "security_lock_toggle"
+        case .securityAlarmCommand: return "security_alarm_command"
         }
     }
 
@@ -45,6 +51,12 @@ public enum DashboardAction: Hashable, Sendable {
             return ["action": name, "entity_id": entityID, "value": temperature]
         case let .climateMode(entityID, mode):
             return ["action": name, "entity_id": entityID, "value": mode]
+        case let .securityCoverToggle(entityID):
+            return ["action": name, "entity_id": entityID]
+        case let .securityLockToggle(entityID):
+            return ["action": name, "entity_id": entityID]
+        case let .securityAlarmCommand(entityID, command):
+            return ["action": name, "entity_id": entityID, "command": command]
         }
     }
 }

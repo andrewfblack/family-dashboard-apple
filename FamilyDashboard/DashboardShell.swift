@@ -133,6 +133,7 @@ struct TabContent: View {
                             case .lights: LightsTab(payload: payload)
                             case .scenes: ScenesTab(payload: payload)
                             case .climate: ClimateTab(payload: payload)
+                            case .security: SecurityTab(payload: payload)
                             }
                         } else {
                             VStack(spacing: 16) {
@@ -481,6 +482,67 @@ struct ClimateTab: View {
             ClimateTile(climate: climate) { action in
                 Task { await model.run(action) }
             }
+        }
+    }
+}
+
+/// Security controls and family presence.
+struct SecurityTab: View {
+    @Environment(DashboardViewModel.self) private var model
+    @Environment(\.dashboardTheme) private var theme
+    let payload: DashboardPayload
+
+    var body: some View {
+        LazyVStack(alignment: .leading, spacing: 16) {
+            ForEach(payload.security.items) { item in
+                Button {
+                    Task { await model.run(action(for: item)) }
+                } label: {
+                    HStack {
+                        Image(systemName: symbol(for: item))
+                            .foregroundStyle(theme.accentColor)
+                        VStack(alignment: .leading) {
+                            Text(item.name).foregroundStyle(theme.body)
+                            Text(item.state.replacingOccurrences(of: "_", with: " ").uppercased())
+                                .font(.caption)
+                                .foregroundStyle(theme.muted)
+                        }
+                        Spacer()
+                    }
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+            }
+            ForEach(payload.security.family) { person in
+                Text("\(person.home ? "●" : "○")  \(person.name)  \(person.home ? "HOME" : "AWAY")")
+                    .foregroundStyle(person.home ? theme.accentColor : theme.muted)
+            }
+            if payload.security.items.isEmpty && payload.security.family.isEmpty {
+                Text("Configure security entities in Home Assistant.")
+                    .foregroundStyle(theme.muted)
+            }
+        }
+    }
+
+    private func action(for item: SecurityItem) -> DashboardAction {
+        switch item.kind.lowercased() {
+        case "cover": return .securityCoverToggle(entityID: item.entityID)
+        case "lock": return .securityLockToggle(entityID: item.entityID)
+        default:
+            return .securityAlarmCommand(
+                entityID: item.entityID,
+                command: item.state.lowercased() == "disarmed" ? "alarm_arm_home" : "alarm_disarm"
+            )
+        }
+    }
+
+    private func symbol(for item: SecurityItem) -> String {
+        switch item.kind.lowercased() {
+        case "cover": return "door.garage.closed"
+        case "lock": return "lock.fill"
+        default: return "shield.fill"
         }
     }
 }
