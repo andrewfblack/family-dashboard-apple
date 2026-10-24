@@ -1,6 +1,7 @@
 import DashboardCore
 import DashboardUI
 import SwiftUI
+import UIKit
 
 /// The dashboard itself: a list of tabs and the screen that is open.
 struct DashboardShell: View {
@@ -114,11 +115,15 @@ private struct IOSScrollableTabBar: View {
 /// The screen for one tab.
 struct TabContent: View {
     @Environment(DashboardViewModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     let tab: DashboardTab
 
     var body: some View {
         let payload = model.payload
+        let viewportWidth = sizeClass == .compact
+            ? min(UIScreen.main.bounds.width, 600)
+            : UIScreen.main.bounds.width
         GeometryReader { geometry in
             ZStack {
                 BackgroundView()
@@ -156,7 +161,10 @@ struct TabContent: View {
                         }
                     }
                     .padding(20)
-                    .frame(width: geometry.size.width, alignment: .leading)
+                    .frame(
+                        width: min(geometry.size.width, viewportWidth),
+                        alignment: .leading
+                    )
                 }
                 .background(Color.clear)
             }
