@@ -169,6 +169,9 @@ struct TVHomeTab: View {
                                 .font(.caption)
                                 .foregroundStyle(theme.muted)
                         }
+                        if let holiday = payload.nextHoliday {
+                            NextHolidayRow(holiday: holiday)
+                        }
                     }
                 }
                 TomorrowEventsCard(payload: payload)

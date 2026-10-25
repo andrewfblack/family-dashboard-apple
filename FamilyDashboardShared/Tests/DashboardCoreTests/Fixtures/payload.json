@@ -129,6 +129,11 @@
       "color": "E87979"
     }
   ],
+  "next_holiday": {
+    "title": "Halloween",
+    "start": "2026-10-31",
+    "all_day": true
+  },
   "month_calendar": {
     "title": "October 2026",
     "year": 2026,

@@ -60,6 +60,8 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(payload.calendarEvents.first?.allDay, false)
         XCTAssertFalse(payload.calendarSchedule.days.isEmpty)
         XCTAssertTrue(payload.calendarSchedule.days.first?.isToday == true)
+        XCTAssertEqual(payload.nextHoliday?.title, "Halloween")
+        XCTAssertEqual(payload.nextHoliday?.start, "2026-10-31")
     }
 
     func testTheControlsAreRead() throws {
@@ -114,6 +116,7 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(payload.title, "Family Dashboard")
         XCTAssertTrue(payload.lights.isEmpty)
         XCTAssertEqual(payload.weeklyMealPlan.count, 0)
+        XCTAssertNil(payload.nextHoliday)
     }
 
     func testAnUnknownFieldIsIgnored() throws {

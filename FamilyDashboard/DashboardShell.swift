@@ -251,6 +251,9 @@ struct HomeTab: View {
                         }
                     }
                 }
+                if let holiday = payload.nextHoliday {
+                    NextHolidayRow(holiday: holiday)
+                }
             }
     }
 

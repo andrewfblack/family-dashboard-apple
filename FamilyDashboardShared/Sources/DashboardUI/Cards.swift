@@ -476,4 +476,40 @@ public struct TomorrowEventsCard: View {
         }
     }
 }
+
+/// A compact callout for the next holiday selected by Home Assistant.
+public struct NextHolidayRow: View {
+    @Environment(\.dashboardTheme) private var theme
+    public let holiday: CalendarEvent
+
+    public init(holiday: CalendarEvent) {
+        self.holiday = holiday
+    }
+
+    public var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "sparkles")
+                .foregroundStyle(theme.accentColor)
+            Text("Next holiday")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(theme.itemHeader)
+            Text(holiday.title)
+                .foregroundStyle(theme.body)
+                .lineLimit(1)
+            Spacer(minLength: 4)
+            if let date = holiday.startDate {
+                Text(date.formatted(.dateTime.month(.abbreviated).day()))
+                    .foregroundStyle(theme.muted)
+            }
+        }
+        .font(.subheadline)
+        .padding(.top, 8)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(theme.itemBorderColor)
+                .frame(height: 1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
 #endif

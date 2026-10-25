@@ -814,6 +814,8 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
     public var monthCalendar: MonthCalendar
     /// The rolling schedule.
     public var calendarSchedule: CalendarSchedule
+    /// The next configured holiday or observance.
+    public var nextHoliday: CalendarEvent?
     /// Which background to use.
     public var background: String
     /// The address of a custom background.
@@ -856,6 +858,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         todayEvents: [CalendarEvent] = [],
         monthCalendar: MonthCalendar = MonthCalendar(),
         calendarSchedule: CalendarSchedule = CalendarSchedule(),
+        nextHoliday: CalendarEvent? = nil,
         background: String = "fall",
         backgroundURL: String = "",
         backgroundVersion: String = "",
@@ -885,6 +888,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         self.todayEvents = todayEvents
         self.monthCalendar = monthCalendar
         self.calendarSchedule = calendarSchedule
+        self.nextHoliday = nextHoliday
         self.background = background
         self.backgroundURL = backgroundURL
         self.backgroundVersion = backgroundVersion
@@ -916,6 +920,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         case todayEvents = "today_events"
         case monthCalendar = "month_calendar"
         case calendarSchedule = "calendar_schedule"
+        case nextHoliday = "next_holiday"
         case background
         case backgroundURL = "background_url"
         case backgroundVersion = "background_version"
@@ -954,6 +959,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         todayEvents = try container.decodeIfPresent([CalendarEvent].self, forKey: .todayEvents) ?? []
         monthCalendar = try container.decodeIfPresent(MonthCalendar.self, forKey: .monthCalendar) ?? defaults.monthCalendar
         calendarSchedule = try container.decodeIfPresent(CalendarSchedule.self, forKey: .calendarSchedule) ?? defaults.calendarSchedule
+        nextHoliday = try container.decodeIfPresent(CalendarEvent.self, forKey: .nextHoliday)
         background = try container.decodeIfPresent(String.self, forKey: .background) ?? defaults.background
         backgroundURL = try container.decodeIfPresent(String.self, forKey: .backgroundURL) ?? defaults.backgroundURL
         backgroundVersion = try container.decodeIfPresent(String.self, forKey: .backgroundVersion) ?? defaults.backgroundVersion
