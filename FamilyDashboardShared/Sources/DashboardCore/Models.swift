@@ -518,6 +518,8 @@ public struct Tabs: Codable, Hashable, Sendable {
     public var climate: Bool
     /// Whether the security tab is shown.
     public var security: Bool
+    /// Whether the iOS-only remote tab is shown.
+    public var remote: Bool
 
     public init(
         calendar: Bool = true,
@@ -525,7 +527,8 @@ public struct Tabs: Codable, Hashable, Sendable {
         lights: Bool = true,
         scenes: Bool = true,
         climate: Bool = true,
-        security: Bool = false
+        security: Bool = false,
+        remote: Bool = false
     ) {
         self.calendar = calendar
         self.weather = weather
@@ -533,6 +536,7 @@ public struct Tabs: Codable, Hashable, Sendable {
         self.lights = lights
         self.climate = climate
         self.security = security
+        self.remote = remote
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -542,6 +546,7 @@ public struct Tabs: Codable, Hashable, Sendable {
         case scenes
         case climate
         case security
+        case remote
     }
 
     public init(from decoder: Decoder) throws {
@@ -553,6 +558,7 @@ public struct Tabs: Codable, Hashable, Sendable {
         scenes = try container.decodeIfPresent(Bool.self, forKey: .scenes) ?? defaults.scenes
         climate = try container.decodeIfPresent(Bool.self, forKey: .climate) ?? defaults.climate
         security = try container.decodeIfPresent(Bool.self, forKey: .security) ?? defaults.security
+        remote = try container.decodeIfPresent(Bool.self, forKey: .remote) ?? defaults.remote
     }
 }
 
@@ -780,6 +786,83 @@ public struct ClimateCard: Codable, Hashable, Identifiable, Sendable {
     }
 }
 
+/// A television or streaming player controlled by the iOS remote.
+public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
+    public var entityID: String
+    public var remoteEntityID: String?
+    public var name: String
+    public var kind: String
+    public var state: String
+    public var volumeLevel: Double?
+    public var isVolumeMuted: Bool
+    public var mediaTitle: String?
+    public var mediaArtist: String?
+    public var source: String?
+    public var sourceList: [String]
+    public var commands: [String]
+
+    public var id: String { entityID }
+
+    public init(
+        entityID: String,
+        remoteEntityID: String? = nil,
+        name: String,
+        kind: String = "generic",
+        state: String = "unknown",
+        volumeLevel: Double? = nil,
+        isVolumeMuted: Bool = false,
+        mediaTitle: String? = nil,
+        mediaArtist: String? = nil,
+        source: String? = nil,
+        sourceList: [String] = [],
+        commands: [String] = []
+    ) {
+        self.entityID = entityID
+        self.remoteEntityID = remoteEntityID
+        self.name = name
+        self.kind = kind
+        self.state = state
+        self.volumeLevel = volumeLevel
+        self.isVolumeMuted = isVolumeMuted
+        self.mediaTitle = mediaTitle
+        self.mediaArtist = mediaArtist
+        self.source = source
+        self.sourceList = sourceList
+        self.commands = commands
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case entityID = "entity_id"
+        case remoteEntityID = "remote_entity_id"
+        case name
+        case kind
+        case state
+        case volumeLevel = "volume_level"
+        case isVolumeMuted = "is_volume_muted"
+        case mediaTitle = "media_title"
+        case mediaArtist = "media_artist"
+        case source
+        case sourceList = "source_list"
+        case commands
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entityID = try container.decode(String.self, forKey: .entityID)
+        remoteEntityID = try container.decodeIfPresent(String.self, forKey: .remoteEntityID)
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? entityID
+        kind = try container.decodeIfPresent(String.self, forKey: .kind) ?? "generic"
+        state = try container.decodeIfPresent(String.self, forKey: .state) ?? "unknown"
+        volumeLevel = try container.decodeIfPresent(Double.self, forKey: .volumeLevel)
+        isVolumeMuted = try container.decodeIfPresent(Bool.self, forKey: .isVolumeMuted) ?? false
+        mediaTitle = try container.decodeIfPresent(String.self, forKey: .mediaTitle)
+        mediaArtist = try container.decodeIfPresent(String.self, forKey: .mediaArtist)
+        source = try container.decodeIfPresent(String.self, forKey: .source)
+        sourceList = try container.decodeIfPresent([String].self, forKey: .sourceList) ?? []
+        commands = try container.decodeIfPresent([String].self, forKey: .commands) ?? []
+    }
+}
+
 /// Everything a client needs to draw the dashboard.
 public struct DashboardPayload: Codable, Hashable, Sendable {
     /// Whether the payload is valid.
@@ -838,12 +921,14 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
     public var climates: [ClimateCard]
     /// Optional security controls and presence data.
     public var security: SecurityData
+    /// Media players available to the iOS-only remote.
+    public var remotes: [RemoteCard]
     /// The identifier of the device that asked.
     public var deviceID: String?
 
     public init(
         ok: Bool = true,
-        schemaVersion: Int = 2,
+        schemaVersion: Int = 3,
         serverTime: String? = nil,
         dashboardID: String? = nil,
         accessMode: String? = nil,
@@ -870,6 +955,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         scenes: [SceneCard] = [],
         climates: [ClimateCard] = [],
         security: SecurityData = SecurityData(),
+        remotes: [RemoteCard] = [],
         deviceID: String? = nil
     ) {
         self.ok = ok
@@ -900,6 +986,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         self.scenes = scenes
         self.climates = climates
         self.security = security
+        self.remotes = remotes
         self.deviceID = deviceID
     }
 
@@ -932,6 +1019,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         case scenes
         case climates
         case security
+        case remotes
         case deviceID = "device_id"
     }
 
@@ -971,6 +1059,7 @@ public struct DashboardPayload: Codable, Hashable, Sendable {
         scenes = try container.decodeIfPresent([SceneCard].self, forKey: .scenes) ?? []
         climates = try container.decodeIfPresent([ClimateCard].self, forKey: .climates) ?? []
         security = try container.decodeIfPresent(SecurityData.self, forKey: .security) ?? defaults.security
+        remotes = try container.decodeIfPresent([RemoteCard].self, forKey: .remotes) ?? []
         deviceID = try container.decodeIfPresent(String.self, forKey: .deviceID)
     }
 }
@@ -1033,6 +1122,15 @@ public enum JSONValue: Codable, Hashable, Sendable {
         case let .string(value): return value
         case let .number(value): return String(value)
         case let .bool(value): return String(value)
+        default: return nil
+        }
+    }
+
+    /// The value as a Boolean, when it is one.
+    public var boolValue: Bool? {
+        switch self {
+        case let .bool(value): return value
+        case let .string(value): return Bool(value)
         default: return nil
         }
     }

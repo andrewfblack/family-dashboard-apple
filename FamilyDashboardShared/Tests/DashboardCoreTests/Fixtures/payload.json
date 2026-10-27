@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "schema_version": 2,
+  "schema_version": 3,
   "server_time": "2026-10-21T19:52:57+00:00",
   "dashboard_id": "entry1",
   "access_mode": "lan",
@@ -295,7 +295,8 @@
     "weather": true,
     "lights": true,
     "scenes": true,
-    "climate": true
+    "climate": true,
+    "remote": true
   },
   "lights": [
     {
@@ -313,6 +314,22 @@
       "state": "on",
       "brightness": null,
       "color_temp_kelvin": null
+    }
+  ],
+  "remotes": [
+    {
+      "entity_id": "media_player.living_room_roku",
+      "remote_entity_id": "remote.living_room_roku",
+      "name": "Living Room Roku",
+      "kind": "roku",
+      "state": "playing",
+      "volume_level": 0.35,
+      "is_volume_muted": false,
+      "media_title": "Family Movie",
+      "media_artist": null,
+      "source": "Netflix",
+      "source_list": ["Home", "Netflix"],
+      "commands": ["up", "down", "left", "right", "select", "back", "home", "replay", "info"]
     }
   ],
   "climates": [

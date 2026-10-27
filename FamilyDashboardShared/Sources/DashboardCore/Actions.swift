@@ -20,6 +20,11 @@ public enum DashboardAction: Hashable, Sendable {
     case securityCoverToggle(entityID: String)
     case securityLockToggle(entityID: String)
     case securityAlarmCommand(entityID: String, command: String)
+    case mediaPower(entityID: String)
+    case mediaPlayPause(entityID: String)
+    case mediaVolume(entityID: String, command: String)
+    case mediaSource(entityID: String, source: String)
+    case remoteCommand(entityID: String, command: String)
 
     /// The name the server knows this action by.
     public var name: String {
@@ -33,6 +38,11 @@ public enum DashboardAction: Hashable, Sendable {
         case .securityCoverToggle: return "security_cover_toggle"
         case .securityLockToggle: return "security_lock_toggle"
         case .securityAlarmCommand: return "security_alarm_command"
+        case .mediaPower: return "media_power"
+        case .mediaPlayPause: return "media_play_pause"
+        case .mediaVolume: return "media_volume"
+        case .mediaSource: return "media_source"
+        case .remoteCommand: return "remote_command"
         }
     }
 
@@ -56,6 +66,16 @@ public enum DashboardAction: Hashable, Sendable {
         case let .securityLockToggle(entityID):
             return ["action": name, "entity_id": entityID]
         case let .securityAlarmCommand(entityID, command):
+            return ["action": name, "entity_id": entityID, "command": command]
+        case let .mediaPower(entityID):
+            return ["action": name, "entity_id": entityID]
+        case let .mediaPlayPause(entityID):
+            return ["action": name, "entity_id": entityID]
+        case let .mediaVolume(entityID, command):
+            return ["action": name, "entity_id": entityID, "command": command]
+        case let .mediaSource(entityID, source):
+            return ["action": name, "entity_id": entityID, "value": source]
+        case let .remoteCommand(entityID, command):
             return ["action": name, "entity_id": entityID, "command": command]
         }
     }

@@ -16,6 +16,8 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
     case climate
     /// Security controls and family presence.
     case security
+    /// Remote controls for selected media players (iOS only).
+    case remote
 
     public var id: String { rawValue }
 
@@ -29,6 +31,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .scenes: return "Scenes"
         case .climate: return "Climate"
         case .security: return "Security"
+        case .remote: return "Remote"
         }
     }
 
@@ -42,6 +45,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .scenes: return "sparkles"
         case .climate: return "thermometer.medium"
         case .security: return "lock.shield.fill"
+        case .remote: return "av.remote.fill"
         }
     }
 
@@ -57,6 +61,7 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
         case .scenes: return tabs.scenes
         case .climate: return tabs.climate
         case .security: return tabs.security
+        case .remote: return tabs.remote
         }
     }
 
@@ -107,6 +112,25 @@ extension DashboardPayload {
             }
             if let action = change.attributes["hvac_action"]?.stringValue {
                 copy.climates[index].hvacAction = action
+            }
+        }
+
+        if let index = copy.remotes.firstIndex(where: { $0.entityID == change.entityID }) {
+            copy.remotes[index].state = change.state
+            if let volume = change.attributes["volume_level"]?.numberValue {
+                copy.remotes[index].volumeLevel = volume
+            }
+            if let muted = change.attributes["is_volume_muted"]?.boolValue {
+                copy.remotes[index].isVolumeMuted = muted
+            }
+            if let title = change.attributes["media_title"]?.stringValue {
+                copy.remotes[index].mediaTitle = title
+            }
+            if let artist = change.attributes["media_artist"]?.stringValue {
+                copy.remotes[index].mediaArtist = artist
+            }
+            if let source = change.attributes["source"]?.stringValue {
+                copy.remotes[index].source = source
             }
         }
 

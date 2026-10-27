@@ -85,6 +85,17 @@ final class ActionTests: XCTestCase {
 
         XCTAssertEqual(action.body["value"] as? String, "heat")
     }
+
+    func testARemoteCommandCarriesThePlayerAndSemanticCommand() {
+        let action = DashboardAction.remoteCommand(
+            entityID: "media_player.living_room_roku",
+            command: "select"
+        )
+
+        XCTAssertEqual(action.name, "remote_command")
+        XCTAssertEqual(action.body["entity_id"] as? String, "media_player.living_room_roku")
+        XCTAssertEqual(action.body["command"] as? String, "select")
+    }
 }
 
 /// Tests for the errors the server reports.

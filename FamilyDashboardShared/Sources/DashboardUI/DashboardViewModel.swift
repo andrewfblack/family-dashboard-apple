@@ -58,7 +58,8 @@ public final class DashboardViewModel {
 
     /// The tabs to show.
     public var tabs: [DashboardTab] {
-        payload?.enabledTabs ?? [.home]
+        let enabled = payload?.enabledTabs ?? [.home]
+        return platform == "ios" ? enabled : enabled.filter { $0 != .remote }
     }
 
     /// Load the stored credential, read the dashboard and open the stream.

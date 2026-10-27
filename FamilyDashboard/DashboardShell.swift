@@ -87,7 +87,7 @@ private struct IOSScrollableTabBar: View {
                         model.selectedTab = tab
                     } label: {
                         VStack(spacing: 4) {
-                            if tab == .security {
+                            if tab == .security || tab == .remote {
                                 Image(systemName: tab.symbol)
                                     .font(.system(size: 21, weight: .medium))
                             } else {
@@ -147,6 +147,7 @@ struct TabContent: View {
                     case .scenes: ScenesTab(payload: payload)
                     case .climate: ClimateTab(payload: payload)
                     case .security: SecurityTab(payload: payload)
+                    case .remote: RemoteTab(payload: payload)
                     }
                 } else {
                     VStack(spacing: 16) {

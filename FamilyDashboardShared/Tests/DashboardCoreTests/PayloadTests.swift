@@ -21,7 +21,7 @@ final class PayloadTests: XCTestCase {
         let payload = try fixture()
 
         XCTAssertTrue(payload.ok)
-        XCTAssertEqual(payload.schemaVersion, 2)
+        XCTAssertEqual(payload.schemaVersion, 3)
         XCTAssertEqual(payload.title, "Family Dashboard")
         XCTAssertNotNil(payload.serverTime)
     }
@@ -77,6 +77,11 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(payload.climates.first?.name, "Hall")
         XCTAssertEqual(payload.climates.first?.hvacModes, ["heat", "off"])
         XCTAssertEqual(payload.climates.first?.targetTempStep, 0.5)
+
+        XCTAssertTrue(payload.tabs.remote)
+        XCTAssertEqual(payload.remotes.first?.kind, "roku")
+        XCTAssertEqual(payload.remotes.first?.remoteEntityID, "remote.living_room_roku")
+        XCTAssertTrue(payload.remotes.first?.commands.contains("replay") == true)
     }
 
     func testTheCapabilitiesAreRead() throws {
@@ -117,6 +122,7 @@ final class PayloadTests: XCTestCase {
         XCTAssertTrue(payload.lights.isEmpty)
         XCTAssertEqual(payload.weeklyMealPlan.count, 0)
         XCTAssertNil(payload.nextHoliday)
+        XCTAssertTrue(payload.remotes.isEmpty)
     }
 
     func testAnUnknownFieldIsIgnored() throws {

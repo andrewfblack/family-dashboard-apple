@@ -130,6 +130,7 @@ struct TVTabContent: View {
         case .scenes: TVScenesTab(payload: payload)
         case .climate: TVClimateTab(payload: payload)
         case .security: TVSecurityTab(payload: payload)
+        case .remote: EmptyView()
                 }
             } else {
                 ProgressView()

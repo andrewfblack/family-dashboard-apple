@@ -60,6 +60,26 @@ final class LiveUpdateTests: XCTestCase {
         XCTAssertEqual(updated.states["input_text.meal"]?.state, "Sushi")
     }
 
+    func testARemotePlayerChangeIsFoldedIn() throws {
+        let payload = try fixture()
+        let change = StateChange(
+            entityID: "media_player.living_room_roku",
+            state: "paused",
+            attributes: [
+                "volume_level": JSONValue.number(0.5),
+                "is_volume_muted": JSONValue.bool(true),
+                "media_title": JSONValue.string("Another Movie"),
+            ]
+        )
+
+        let updated = payload.applying(change)
+
+        XCTAssertEqual(updated.remotes.first?.state, "paused")
+        XCTAssertEqual(updated.remotes.first?.volumeLevel, 0.5)
+        XCTAssertEqual(updated.remotes.first?.isVolumeMuted, true)
+        XCTAssertEqual(updated.remotes.first?.mediaTitle, "Another Movie")
+    }
+
     func testTheOriginalPayloadIsNotChanged() throws {
         let payload = try fixture()
         let change = StateChange(entityID: "light.kitchen", state: "off", attributes: [:])
@@ -82,13 +102,29 @@ final class LiveUpdateTests: XCTestCase {
 /// Tests for the tabs.
 final class TabTests: XCTestCase {
     func testTheHomeTabIsAlwaysThere() {
-        let tabs = Tabs(calendar: false, weather: false, lights: false, scenes: false, climate: false)
+        let tabs = Tabs(
+            calendar: false,
+            weather: false,
+            lights: false,
+            scenes: false,
+            climate: false,
+            security: false,
+            remote: false
+        )
 
         XCTAssertEqual(DashboardTab.enabled(in: tabs), [.home])
     }
 
     func testEveryTabCanBeSwitchedOn() {
-        let tabs = Tabs(calendar: true, weather: true, lights: true, scenes: true, climate: true)
+        let tabs = Tabs(
+            calendar: true,
+            weather: true,
+            lights: true,
+            scenes: true,
+            climate: true,
+            security: true,
+            remote: true
+        )
 
         XCTAssertEqual(DashboardTab.enabled(in: tabs), DashboardTab.allCases)
     }
