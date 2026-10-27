@@ -32,6 +32,8 @@ final class PayloadTests: XCTestCase {
         XCTAssertTrue(payload.theme.accent.hasPrefix("#"))
         XCTAssertEqual(payload.theme.accent.count, 7)
         XCTAssertEqual(payload.theme.itemOpacity, 90)
+        XCTAssertEqual(payload.theme.remoteButtonBackground, "#000000")
+        XCTAssertEqual(payload.theme.remoteButtonText, "#FFFFFF")
     }
 
     func testTheEntitiesAreResolved() throws {

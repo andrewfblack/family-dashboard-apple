@@ -25,17 +25,11 @@ struct RemoteTab: View {
                     powerAndSource(player)
 
                     if !player.commands.isEmpty {
-                        sectionTitle("Navigation")
                         directionPad(player)
-
-                        sectionTitle("Shortcuts")
                         shortcutControls(player)
                     }
 
-                    sectionTitle("Volume")
                     volumeControls(player)
-
-                    sectionTitle("Playback")
                     playbackControls(player)
                 }
             }
@@ -96,10 +90,10 @@ struct RemoteTab: View {
 
     private func powerAndSource(_ player: RemoteCard) -> some View {
         HStack(spacing: 14) {
-            LabeledRemoteButton(
+            RemoteControlButton(
                 symbol: "power",
                 label: "Power",
-                tint: theme.accentColor
+                expands: true
             ) {
                 run(.mediaPower(entityID: player.entityID))
             }
@@ -118,22 +112,26 @@ struct RemoteTab: View {
                     }
                 }
             } label: {
-                Label("Source", systemImage: "rectangle.connected.to.line.below")
-                    .frame(maxWidth: .infinity, minHeight: 52)
+                remoteButtonFace(
+                    symbol: "rectangle.connected.to.line.below",
+                    expands: true
+                )
             }
-            .buttonStyle(.bordered)
-            .tint(theme.itemHeader)
+            .buttonStyle(.plain)
+            .accessibilityLabel("Source")
         } else if player.commands.contains("input") {
-            LabeledRemoteButton(
+            RemoteControlButton(
                 symbol: "rectangle.connected.to.line.below",
-                label: "Source"
+                label: "Source",
+                expands: true
             ) {
                 run(.remoteCommand(entityID: player.entityID, command: "input"))
             }
         } else {
-            LabeledRemoteButton(
+            RemoteControlButton(
                 symbol: "rectangle.connected.to.line.below",
                 label: "Source",
+                expands: true,
                 enabled: false,
                 action: {}
             )
@@ -162,7 +160,7 @@ struct RemoteTab: View {
     }
 
     private func shortcutControls(_ player: RemoteCard) -> some View {
-        let commands = ["back", "home", "menu", "replay", "info"]
+        let commands = ["back", "home", "menu", "replay", "options"]
             .filter { player.commands.contains($0) }
         return LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 12) {
             ForEach(commands, id: \.self) { command in
@@ -173,16 +171,17 @@ struct RemoteTab: View {
 
     private func volumeControls(_ player: RemoteCard) -> some View {
         HStack(spacing: 14) {
-            LabeledRemoteButton(symbol: "speaker.minus.fill", label: "Down") {
+            RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
                 run(.mediaVolume(entityID: player.entityID, command: "down"))
             }
-            LabeledRemoteButton(
+            RemoteControlButton(
                 symbol: player.isVolumeMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                label: "Mute"
+                label: "Mute",
+                expands: true
             ) {
                 run(.mediaVolume(entityID: player.entityID, command: "mute"))
             }
-            LabeledRemoteButton(symbol: "speaker.plus.fill", label: "Up") {
+            RemoteControlButton(symbol: "speaker.plus.fill", label: "Volume up", expands: true) {
                 run(.mediaVolume(entityID: player.entityID, command: "up"))
             }
         }
@@ -190,16 +189,30 @@ struct RemoteTab: View {
     }
 
     private func playbackControls(_ player: RemoteCard) -> some View {
-        HStack {
-            Spacer()
-            LabeledRemoteButton(
+        HStack(spacing: 14) {
+            RemoteControlButton(
+                symbol: "backward.fill",
+                label: "Rewind",
+                expands: true,
+                enabled: player.commands.contains("reverse")
+            ) {
+                run(.remoteCommand(entityID: player.entityID, command: "reverse"))
+            }
+            RemoteControlButton(
                 symbol: "playpause.fill",
                 label: "Play / Pause",
-                tint: theme.accentColor
+                expands: true
             ) {
                 run(.mediaPlayPause(entityID: player.entityID))
             }
-            Spacer()
+            RemoteControlButton(
+                symbol: "forward.fill",
+                label: "Fast forward",
+                expands: true,
+                enabled: player.commands.contains("forward")
+            ) {
+                run(.remoteCommand(entityID: player.entityID, command: "forward"))
+            }
         }
     }
 
@@ -225,10 +238,15 @@ struct RemoteTab: View {
             .frame(height: 1)
     }
 
-    private func sectionTitle(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(theme.muted)
+    private func remoteButtonFace(symbol: String, expands: Bool = false) -> some View {
+        Image(systemName: symbol)
+            .font(.title3.weight(.semibold))
+            .foregroundStyle(theme.remoteButtonTextColor)
+            .frame(maxWidth: expands ? .infinity : 68, minHeight: 56)
+            .background(
+                theme.remoteButtonBackgroundColor,
+                in: RoundedRectangle(cornerRadius: 12)
+            )
     }
 
     private func run(_ action: DashboardAction) {
@@ -254,7 +272,7 @@ struct RemoteTab: View {
         case "home": return "house.fill"
         case "menu": return "list.bullet"
         case "replay": return "gobackward"
-        case "info": return "info.circle"
+        case "options": return "asterisk"
         default: return "circle"
         }
     }
@@ -264,50 +282,38 @@ private struct RemoteControlButton: View {
     @Environment(\.dashboardTheme) private var theme
     let symbol: String
     let label: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.title3.weight(.semibold))
-                .frame(minWidth: 52, minHeight: 52)
-        }
-        .buttonStyle(.bordered)
-        .tint(theme.itemHeader)
-        .accessibilityLabel(label)
-    }
-}
-
-private struct LabeledRemoteButton: View {
-    @Environment(\.dashboardTheme) private var theme
-    let symbol: String
-    let label: String
-    var tint: Color? = nil
+    var expands = false
     var enabled = true
     let action: () -> Void
 
     init(
         symbol: String,
         label: String,
-        tint: Color? = nil,
+        expands: Bool = false,
         enabled: Bool = true,
         action: @escaping () -> Void
     ) {
         self.symbol = symbol
         self.label = label
-        self.tint = tint
+        self.expands = expands
         self.enabled = enabled
         self.action = action
     }
 
     var body: some View {
         Button(action: action) {
-            Label(label, systemImage: symbol)
-                .frame(maxWidth: .infinity, minHeight: 52)
+            Image(systemName: symbol)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(theme.remoteButtonTextColor)
+                .frame(maxWidth: expands ? .infinity : 68, minHeight: 56)
+                .background(
+                    theme.remoteButtonBackgroundColor,
+                    in: RoundedRectangle(cornerRadius: 12)
+                )
         }
-        .buttonStyle(.bordered)
-        .tint(tint ?? theme.itemHeader)
+        .buttonStyle(.plain)
         .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.45)
         .accessibilityLabel(label)
     }
 }

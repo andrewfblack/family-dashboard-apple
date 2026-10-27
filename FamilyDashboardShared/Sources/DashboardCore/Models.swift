@@ -26,6 +26,10 @@ public struct Theme: Codable, Hashable, Sendable {
     public var selectedBorder: String
     /// The colour of a card's border.
     public var itemBorder: String
+    /// The background colour of iOS remote buttons.
+    public var remoteButtonBackground: String
+    /// The icon colour of iOS remote buttons.
+    public var remoteButtonText: String
     /// How solid the cards are, from 0 to 100.
     public var itemOpacity: Int
     /// How much the background is darkened, from 0 to 100.
@@ -42,6 +46,8 @@ public struct Theme: Codable, Hashable, Sendable {
         selectedBackground: String = "#9B542B",
         selectedBorder: String = "#FFD28C",
         itemBorder: String = "#59483C",
+        remoteButtonBackground: String = "#000000",
+        remoteButtonText: String = "#FFFFFF",
         itemOpacity: Int = 90,
         backgroundOverlay: Int = 48
     ) {
@@ -55,6 +61,8 @@ public struct Theme: Codable, Hashable, Sendable {
         self.selectedBackground = selectedBackground
         self.selectedBorder = selectedBorder
         self.itemBorder = itemBorder
+        self.remoteButtonBackground = remoteButtonBackground
+        self.remoteButtonText = remoteButtonText
         self.itemOpacity = itemOpacity
         self.backgroundOverlay = backgroundOverlay
     }
@@ -70,6 +78,8 @@ public struct Theme: Codable, Hashable, Sendable {
         case selectedBackground = "selected_background"
         case selectedBorder = "selected_border"
         case itemBorder = "item_border"
+        case remoteButtonBackground = "remote_button_background"
+        case remoteButtonText = "remote_button_text"
         case itemOpacity = "item_opacity"
         case backgroundOverlay = "background_overlay"
     }
@@ -87,6 +97,8 @@ public struct Theme: Codable, Hashable, Sendable {
         selectedBackground = try container.decodeIfPresent(String.self, forKey: .selectedBackground) ?? defaults.selectedBackground
         selectedBorder = try container.decodeIfPresent(String.self, forKey: .selectedBorder) ?? defaults.selectedBorder
         itemBorder = try container.decodeIfPresent(String.self, forKey: .itemBorder) ?? defaults.itemBorder
+        remoteButtonBackground = try container.decodeIfPresent(String.self, forKey: .remoteButtonBackground) ?? defaults.remoteButtonBackground
+        remoteButtonText = try container.decodeIfPresent(String.self, forKey: .remoteButtonText) ?? defaults.remoteButtonText
         itemOpacity = try container.decodeIfPresent(Int.self, forKey: .itemOpacity) ?? defaults.itemOpacity
         backgroundOverlay = try container.decodeIfPresent(Int.self, forKey: .backgroundOverlay) ?? defaults.backgroundOverlay
     }

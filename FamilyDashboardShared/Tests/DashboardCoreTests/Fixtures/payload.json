@@ -16,6 +16,8 @@
     "selected_background": "#9B542B",
     "selected_border": "#FFD28C",
     "item_border": "#59483C",
+    "remote_button_background": "#000000",
+    "remote_button_text": "#FFFFFF",
     "item_opacity": 90,
     "background_overlay": 48
   },
@@ -329,7 +331,7 @@
       "media_artist": null,
       "source": "Netflix",
       "source_list": ["Home", "Netflix"],
-      "commands": ["up", "down", "left", "right", "select", "back", "home", "replay", "info"]
+      "commands": ["up", "down", "left", "right", "select", "back", "home", "reverse", "forward", "replay", "options", "info"]
     }
   ],
   "climates": [

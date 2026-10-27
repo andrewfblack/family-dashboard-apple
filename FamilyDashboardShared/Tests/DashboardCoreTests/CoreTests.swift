@@ -96,6 +96,7 @@ final class ActionTests: XCTestCase {
         XCTAssertEqual(action.body["entity_id"] as? String, "media_player.living_room_roku")
         XCTAssertEqual(action.body["command"] as? String, "select")
     }
+
 }
 
 /// Tests for the errors the server reports.

@@ -56,6 +56,10 @@ extension Theme {
     public var selectedBorderColor: Color { Color(hex: selectedBorder) }
     /// The colour of a card's border.
     public var itemBorderColor: Color { Color(hex: itemBorder) }
+    /// The colour behind iOS remote buttons.
+    public var remoteButtonBackgroundColor: Color { Color(hex: remoteButtonBackground) }
+    /// The colour of icons on iOS remote buttons.
+    public var remoteButtonTextColor: Color { Color(hex: remoteButtonText) }
     /// The fallback background colour.
     public var backgroundColor: Color { Color(hex: background) }
 }
