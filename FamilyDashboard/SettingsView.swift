@@ -33,7 +33,7 @@ struct SettingsView: View {
                 }
 
                 if model.platform == "ios", model.payload != nil {
-                    Section("Personalize") {
+                    Section {
                         NavigationLink("Reorder dashboard tabs") {
                             TabOrderSettingsView()
                         }
@@ -42,6 +42,8 @@ struct SettingsView: View {
                                 RemoteOrderSettingsView()
                             }
                         }
+                    } header: {
+                        Text("Personalize")
                     } footer: {
                         Text("Ordering is saved on this device and does not change other dashboard clients.")
                     }
