@@ -6,6 +6,7 @@ import SwiftUI
 struct DashboardShell: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dashboardTheme) private var theme
     @State private var showingSettings = false
 
     /// The selection of the tab list, which is optional so a tab can be
@@ -52,6 +53,13 @@ struct DashboardShell: View {
     /// so the compact iPhone path has to provide one.
     @ToolbarContentBuilder
     private var dashboardToolbar: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Text(model.payload?.title ?? "Family Dashboard")
+                .font(.headline.weight(.bold))
+                .foregroundStyle(theme.header)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Button {
                 Task { await model.refresh() }
@@ -137,7 +145,6 @@ struct TabContent: View {
         let payload = model.payload
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                DashboardHeader(title: payload?.title ?? "Family Dashboard")
                 if let payload {
                     switch tab {
                     case .home: HomeTab(payload: payload)
@@ -177,29 +184,6 @@ struct TabContent: View {
             await model.refresh()
         }
         .background(BackgroundView())
-    }
-}
-
-/// The Roku-style dashboard heading.
-struct DashboardHeader: View {
-    @Environment(\.dashboardTheme) private var theme
-    let title: String
-
-    var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(title)
-                .font(.title2.weight(.bold))
-                .foregroundStyle(theme.header)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-            Spacer()
-            Text(Date.now.formatted(date: .complete, time: .shortened))
-                .font(.caption)
-                .foregroundStyle(theme.muted)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-        }
-        .padding(.horizontal, 4)
     }
 }
 

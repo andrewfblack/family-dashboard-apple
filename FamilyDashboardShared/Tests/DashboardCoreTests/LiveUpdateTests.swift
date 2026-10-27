@@ -135,6 +135,21 @@ final class TabTests: XCTestCase {
         XCTAssertEqual(DashboardTab.enabled(in: tabs), [.home, .calendar, .lights, .climate])
     }
 
+    func testTheAdministratorCanReorderTabs() {
+        let tabs = Tabs(
+            calendar: true,
+            weather: true,
+            lights: false,
+            scenes: false,
+            climate: false,
+            security: false,
+            remote: true,
+            order: ["remote", "home", "weather", "calendar"]
+        )
+
+        XCTAssertEqual(DashboardTab.enabled(in: tabs), [.remote, .home, .weather, .calendar])
+    }
+
     func testEveryTabHasANameAndASymbol() {
         for tab in DashboardTab.allCases {
             XCTAssertFalse(tab.title.isEmpty)

@@ -298,7 +298,8 @@
     "lights": true,
     "scenes": true,
     "climate": true,
-    "remote": true
+    "remote": true,
+    "order": ["home", "remote", "calendar", "weather", "lights", "scenes", "climate", "security"]
   },
   "lights": [
     {

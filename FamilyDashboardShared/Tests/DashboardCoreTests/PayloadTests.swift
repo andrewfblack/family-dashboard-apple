@@ -81,6 +81,7 @@ final class PayloadTests: XCTestCase {
         XCTAssertEqual(payload.climates.first?.targetTempStep, 0.5)
 
         XCTAssertTrue(payload.tabs.remote)
+        XCTAssertEqual(payload.tabs.order.prefix(3), ["home", "remote", "calendar"])
         XCTAssertEqual(payload.remotes.first?.kind, "roku")
         XCTAssertEqual(payload.remotes.first?.remoteEntityID, "remote.living_room_roku")
         XCTAssertTrue(payload.remotes.first?.commands.contains("replay") == true)
