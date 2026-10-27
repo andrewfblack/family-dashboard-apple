@@ -15,8 +15,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "1.5.2"
-    CURRENT_PROJECT_VERSION: "33"
+    MARKETING_VERSION: "1.5.3"
+    CURRENT_PROJECT_VERSION: "34"
     CODE_SIGN_STYLE: Automatic
     # Put your Apple Developer team here, or pick one in Xcode after the
     # project is generated. It is saved in the project either way.

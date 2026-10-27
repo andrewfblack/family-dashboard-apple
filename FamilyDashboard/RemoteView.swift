@@ -17,22 +17,7 @@ struct RemoteTab: View {
 
     var body: some View {
         if let player {
-            DashboardCard("Remote", symbol: symbol(for: player.kind)) {
-                VStack(alignment: .leading, spacing: 20) {
-                    playerPicker
-                    nowPlaying(player)
-                    divider
-                    powerAndSource(player)
-
-                    if !player.commands.isEmpty {
-                        directionPad(player)
-                        shortcutControls(player)
-                    }
-
-                    volumeControls(player)
-                    playbackControls(player)
-                }
-            }
+            remoteCard(player)
             .onAppear {
                 if selectedPlayerID == nil {
                     selectedPlayerID = payload.remotes.first?.entityID
@@ -46,25 +31,66 @@ struct RemoteTab: View {
         }
     }
 
-    private var playerPicker: some View {
-        Picker("Media player", selection: Binding(
-            get: { selectedPlayerID ?? payload.remotes.first?.entityID ?? "" },
-            set: { selectedPlayerID = $0 }
-        )) {
-            ForEach(payload.remotes) { player in
-                Text(player.name).tag(player.entityID)
+    private func remoteCard(_ player: RemoteCard) -> some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                playerSwitcher(player)
+                Spacer(minLength: 8)
+                Text(deviceType(player.kind))
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(theme.muted)
             }
+
+            nowPlaying(player)
+            divider
+            powerAndSource(player)
+
+            if !player.commands.isEmpty {
+                directionPad(player)
+                shortcutControls(player)
+            }
+
+            volumeControls(player)
+            playbackControls(player)
         }
-        .pickerStyle(.menu)
-        .tint(theme.accentColor)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(theme.itemBorderColor, lineWidth: 1)
+        )
+    }
+
+    private func playerSwitcher(_ player: RemoteCard) -> some View {
+        Menu {
+            ForEach(payload.remotes) { option in
+                Button {
+                    selectedPlayerID = option.entityID
+                } label: {
+                    if option.entityID == player.entityID {
+                        Label(option.name, systemImage: "checkmark")
+                    } else {
+                        Text(option.name)
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Text(player.name)
+                    .font(.title2.weight(.bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.bold))
+            }
+            .foregroundStyle(theme.itemHeader)
+        }
+        .accessibilityLabel("Media player, \(player.name)")
     }
 
     private func nowPlaying(_ player: RemoteCard) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(player.name)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(theme.itemHeader)
             Text(player.mediaTitle ?? player.source ?? stateLabel(player.state))
                 .font(.headline)
                 .foregroundStyle(theme.body)
@@ -77,14 +103,11 @@ struct RemoteTab: View {
                     .font(.subheadline)
                     .foregroundStyle(theme.muted)
             }
-            HStack(spacing: 10) {
-                Text(player.kind.replacingOccurrences(of: "_", with: " ").uppercased())
-                if let volume = player.volumeLevel {
-                    Text("Volume \(Int((volume * 100).rounded()))%")
-                }
+            if let volume = player.volumeLevel {
+                Text("Volume \(Int((volume * 100).rounded()))%")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(theme.muted)
             }
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(theme.muted)
         }
     }
 
@@ -257,12 +280,12 @@ struct RemoteTab: View {
         state.replacingOccurrences(of: "_", with: " ").capitalized
     }
 
-    private func symbol(for kind: String) -> String {
+    private func deviceType(_ kind: String) -> String {
         switch kind {
-        case "apple_tv": return "appletv.fill"
-        case "roku": return "play.tv.fill"
-        case "lg": return "tv.fill"
-        default: return "av.remote.fill"
+        case "apple_tv": return "APPLE TV"
+        case "roku": return "ROKU"
+        case "lg": return "LG TV"
+        default: return "MEDIA PLAYER"
         }
     }
 
