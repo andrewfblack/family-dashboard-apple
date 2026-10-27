@@ -53,12 +53,13 @@ struct DashboardShell: View {
     /// so the compact iPhone path has to provide one.
     @ToolbarContentBuilder
     private var dashboardToolbar: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
+        ToolbarItem(placement: .principal) {
             Text(model.payload?.title ?? "Family Dashboard")
-                .font(.headline.weight(.bold))
+                .font(.subheadline.weight(.bold))
                 .foregroundStyle(theme.header)
                 .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button {

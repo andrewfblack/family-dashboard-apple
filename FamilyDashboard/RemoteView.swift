@@ -11,8 +11,12 @@ struct RemoteTab: View {
     let payload: DashboardPayload
 
     private var player: RemoteCard? {
-        payload.remotes.first(where: { $0.entityID == selectedPlayerID })
-            ?? payload.remotes.first
+        orderedRemotes.first(where: { $0.entityID == selectedPlayerID })
+            ?? orderedRemotes.first
+    }
+
+    private var orderedRemotes: [RemoteCard] {
+        model.orderedRemotes(payload.remotes)
     }
 
     var body: some View {
@@ -20,7 +24,7 @@ struct RemoteTab: View {
             remoteCard(player)
             .onAppear {
                 if selectedPlayerID == nil {
-                    selectedPlayerID = payload.remotes.first?.entityID
+                    selectedPlayerID = orderedRemotes.first?.entityID
                 }
             }
         } else {
@@ -64,7 +68,7 @@ struct RemoteTab: View {
 
     private func playerSwitcher(_ player: RemoteCard) -> some View {
         Menu {
-            ForEach(payload.remotes) { option in
+            ForEach(orderedRemotes) { option in
                 Button {
                     selectedPlayerID = option.entityID
                 } label: {

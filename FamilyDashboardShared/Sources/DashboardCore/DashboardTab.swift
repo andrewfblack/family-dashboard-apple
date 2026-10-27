@@ -67,9 +67,17 @@ public enum DashboardTab: String, CaseIterable, Identifiable, Sendable {
 
     /// The tabs to show, in order.
     public static func enabled(in tabs: Tabs) -> [DashboardTab] {
-        let preferred = tabs.order.compactMap(DashboardTab.init(rawValue:))
-        let ordered = preferred + allCases.filter { !preferred.contains($0) }
-        return ordered.filter { $0.isEnabled(in: tabs) }
+        allCases.filter { $0.isEnabled(in: tabs) }
+    }
+
+    /// Put available tabs in the preferred order, appending any new tabs.
+    public static func ordered(
+        _ available: [DashboardTab],
+        preferred: [DashboardTab]
+    ) -> [DashboardTab] {
+        let ordered = preferred.filter { available.contains($0) }
+            + available.filter { !preferred.contains($0) }
+        return ordered
     }
 }
 

@@ -32,6 +32,21 @@ struct SettingsView: View {
                     LabeledContent("Address", value: model.serverAddress)
                 }
 
+                if model.platform == "ios", model.payload != nil {
+                    Section("Personalize") {
+                        NavigationLink("Reorder dashboard tabs") {
+                            TabOrderSettingsView()
+                        }
+                        if !(model.payload?.remotes.isEmpty ?? true) {
+                            NavigationLink("Reorder remote players") {
+                                RemoteOrderSettingsView()
+                            }
+                        }
+                    } footer: {
+                        Text("Ordering is saved on this device and does not change other dashboard clients.")
+                    }
+                }
+
                 Section {
                     Button("Unpair this device", role: .destructive) {
                         Task {
@@ -52,6 +67,73 @@ struct SettingsView: View {
             .onAppear {
                 address = model.serverAddress
             }
+        }
+    }
+}
+
+private struct TabOrderSettingsView: View {
+    @Environment(DashboardViewModel.self) private var model
+    @State private var editMode: EditMode = .inactive
+
+    var body: some View {
+        List {
+            ForEach(model.tabs) { tab in
+                Label(tab.title, systemImage: tab.symbol)
+            }
+            .onMove { indices, destination in
+                var tabs = model.tabs
+                tabs.move(fromOffsets: indices, toOffset: destination)
+                model.setTabOrder(tabs)
+            }
+        }
+        .environment(\.editMode, $editMode)
+        .navigationTitle("Dashboard Tabs")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+            }
+        }
+    }
+}
+
+private struct RemoteOrderSettingsView: View {
+    @Environment(DashboardViewModel.self) private var model
+    @State private var editMode: EditMode = .inactive
+
+    private var remotes: [RemoteCard] {
+        model.payload.map { model.orderedRemotes($0.remotes) } ?? []
+    }
+
+    var body: some View {
+        List {
+            ForEach(remotes) { remote in
+                HStack {
+                    Image(systemName: icon(for: remote.kind))
+                        .foregroundStyle(.secondary)
+                    Text(remote.name)
+                }
+            }
+            .onMove { indices, destination in
+                var ordered = remotes
+                ordered.move(fromOffsets: indices, toOffset: destination)
+                model.setRemoteOrder(ordered)
+            }
+        }
+        .environment(\.editMode, $editMode)
+        .navigationTitle("Remote Players")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+            }
+        }
+    }
+
+    private func icon(for kind: String) -> String {
+        switch kind {
+        case "apple_tv": return "appletv.fill"
+        case "roku": return "play.tv.fill"
+        case "lg": return "tv.fill"
+        default: return "av.remote.fill"
         }
     }
 }

@@ -532,8 +532,6 @@ public struct Tabs: Codable, Hashable, Sendable {
     public var security: Bool
     /// Whether the iOS-only remote tab is shown.
     public var remote: Bool
-    /// The administrator's preferred tab order.
-    public var order: [String]
 
     public init(
         calendar: Bool = true,
@@ -542,11 +540,7 @@ public struct Tabs: Codable, Hashable, Sendable {
         scenes: Bool = true,
         climate: Bool = true,
         security: Bool = false,
-        remote: Bool = false,
-        order: [String] = [
-            "home", "calendar", "weather", "lights", "scenes", "climate",
-            "security", "remote",
-        ]
+        remote: Bool = false
     ) {
         self.calendar = calendar
         self.weather = weather
@@ -555,7 +549,6 @@ public struct Tabs: Codable, Hashable, Sendable {
         self.climate = climate
         self.security = security
         self.remote = remote
-        self.order = order
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -566,7 +559,6 @@ public struct Tabs: Codable, Hashable, Sendable {
         case climate
         case security
         case remote
-        case order
     }
 
     public init(from decoder: Decoder) throws {
@@ -579,7 +571,6 @@ public struct Tabs: Codable, Hashable, Sendable {
         climate = try container.decodeIfPresent(Bool.self, forKey: .climate) ?? defaults.climate
         security = try container.decodeIfPresent(Bool.self, forKey: .security) ?? defaults.security
         remote = try container.decodeIfPresent(Bool.self, forKey: .remote) ?? defaults.remote
-        order = try container.decodeIfPresent([String].self, forKey: .order) ?? defaults.order
     }
 }
 
@@ -865,6 +856,21 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         case source
         case sourceList = "source_list"
         case commands
+    }
+
+    /// Put available players in the preferred order, appending newly selected players.
+    public static func ordered(_ remotes: [RemoteCard], preferredIDs: [String]) -> [RemoteCard] {
+        var rank: [String: Int] = [:]
+        for (index, entityID) in preferredIDs.enumerated() where rank[entityID] == nil {
+            rank[entityID] = index
+        }
+        return remotes.enumerated()
+            .sorted { lhs, rhs in
+                let leftRank = rank[lhs.element.entityID] ?? Int.max
+                let rightRank = rank[rhs.element.entityID] ?? Int.max
+                return leftRank == rightRank ? lhs.offset < rhs.offset : leftRank < rightRank
+            }
+            .map { $0.element }
     }
 
     public init(from decoder: Decoder) throws {

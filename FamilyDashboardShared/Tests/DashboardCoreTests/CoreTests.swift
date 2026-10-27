@@ -97,6 +97,25 @@ final class ActionTests: XCTestCase {
         XCTAssertEqual(action.body["command"] as? String, "select")
     }
 
+    func testPreferredRemoteOrderAppendsNewPlayersStably() {
+        let players = [
+            RemoteCard(entityID: "media_player.den", name: "Den"),
+            RemoteCard(entityID: "media_player.bedroom", name: "Bedroom"),
+            RemoteCard(entityID: "media_player.kitchen", name: "Kitchen"),
+        ]
+
+        let ordered = RemoteCard.ordered(
+            players,
+            preferredIDs: ["media_player.bedroom", "media_player.den"]
+        )
+
+        XCTAssertEqual(ordered.map(\.entityID), [
+            "media_player.bedroom",
+            "media_player.den",
+            "media_player.kitchen",
+        ])
+    }
+
 }
 
 /// Tests for the errors the server reports.

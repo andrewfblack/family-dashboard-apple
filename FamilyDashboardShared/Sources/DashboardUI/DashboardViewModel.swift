@@ -29,6 +29,10 @@ public final class DashboardViewModel {
     public var serverAddress: String
     /// The tab that is open.
     public var selectedTab: DashboardTab = .home
+    /// The locally preferred order of dashboard tabs on this device.
+    public private(set) var tabOrder: [DashboardTab]
+    /// The locally preferred order of remote players on this device.
+    public private(set) var remoteOrder: [String]
     /// The name of this device, shown when it asks to pair.
     public var deviceName: String = ProcessInfo.processInfo.hostName
     /// The platform this app runs on.
@@ -36,6 +40,8 @@ public final class DashboardViewModel {
 
     private let session: DashboardSession
     private let appVersion: String
+    private static let tabOrderDefaultsKey = "FamilyDashboard.iOS.tabOrder"
+    private static let remoteOrderDefaultsKey = "FamilyDashboard.iOS.remoteOrder"
     private var streamTask: Task<Void, Never>?
     private var discovery: HomeAssistantDiscovery?
 
@@ -49,6 +55,13 @@ public final class DashboardViewModel {
         self.platform = platform
         self.appVersion = appVersion
         self.serverAddress = ServerConfiguration.defaultServerAddress
+        let savedTabIDs = UserDefaults.standard.stringArray(forKey: Self.tabOrderDefaultsKey) ?? []
+        var savedTabs: [DashboardTab] = []
+        for tab in savedTabIDs.compactMap(DashboardTab.init(rawValue:)) where !savedTabs.contains(tab) {
+            savedTabs.append(tab)
+        }
+        self.tabOrder = savedTabs + DashboardTab.allCases.filter { !savedTabs.contains($0) }
+        self.remoteOrder = UserDefaults.standard.stringArray(forKey: Self.remoteOrderDefaultsKey) ?? []
     }
 
     /// The colours of the dashboard.
@@ -59,7 +72,29 @@ public final class DashboardViewModel {
     /// The tabs to show.
     public var tabs: [DashboardTab] {
         let enabled = payload?.enabledTabs ?? [.home]
-        return platform == "ios" ? enabled : enabled.filter { $0 != .remote }
+        let available = platform == "ios" ? enabled : enabled.filter { $0 != .remote }
+        return DashboardTab.ordered(available, preferred: tabOrder)
+    }
+
+    /// Sort the selected media players using this device's saved preference.
+    public func orderedRemotes(_ remotes: [RemoteCard]) -> [RemoteCard] {
+        RemoteCard.ordered(remotes, preferredIDs: remoteOrder)
+    }
+
+    /// Save a reordered tab list while retaining the order of currently disabled tabs.
+    public func setTabOrder(_ orderedTabs: [DashboardTab]) {
+        let currentIDs = orderedTabs.map(\.rawValue)
+        let retainedIDs = tabOrder.map(\.rawValue).filter { !currentIDs.contains($0) }
+        tabOrder = orderedTabs + retainedIDs.compactMap(DashboardTab.init(rawValue:))
+        UserDefaults.standard.set(tabOrder.map(\.rawValue), forKey: Self.tabOrderDefaultsKey)
+    }
+
+    /// Save a reordered remote list while retaining entries that are not currently selected.
+    public func setRemoteOrder(_ remotes: [RemoteCard]) {
+        let currentIDs = remotes.map(\.entityID)
+        let retainedIDs = remoteOrder.filter { !currentIDs.contains($0) }
+        remoteOrder = currentIDs + retainedIDs
+        UserDefaults.standard.set(remoteOrder, forKey: Self.remoteOrderDefaultsKey)
     }
 
     /// Load the stored credential, read the dashboard and open the stream.

@@ -28,7 +28,9 @@
       "light_brightness",
       "scene_activate",
       "climate_temperature",
-      "climate_mode"
+      "climate_mode",
+      "security_alarm_command",
+      "remote_command"
     ],
     "stream": true,
     "background": true,
@@ -298,8 +300,7 @@
     "lights": true,
     "scenes": true,
     "climate": true,
-    "remote": true,
-    "order": ["home", "remote", "calendar", "weather", "lights", "scenes", "climate", "security"]
+    "remote": true
   },
   "lights": [
     {

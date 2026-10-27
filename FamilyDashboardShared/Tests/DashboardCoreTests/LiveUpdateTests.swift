@@ -135,19 +135,13 @@ final class TabTests: XCTestCase {
         XCTAssertEqual(DashboardTab.enabled(in: tabs), [.home, .calendar, .lights, .climate])
     }
 
-    func testTheAdministratorCanReorderTabs() {
-        let tabs = Tabs(
-            calendar: true,
-            weather: true,
-            lights: false,
-            scenes: false,
-            climate: false,
-            security: false,
-            remote: true,
-            order: ["remote", "home", "weather", "calendar"]
+    func testPreferredTabOrderAppendsNewlyAvailableTabs() {
+        let ordered = DashboardTab.ordered(
+            [.home, .calendar, .weather, .remote],
+            preferred: [.remote, .home]
         )
 
-        XCTAssertEqual(DashboardTab.enabled(in: tabs), [.remote, .home, .weather, .calendar])
+        XCTAssertEqual(ordered, [.remote, .home, .calendar, .weather])
     }
 
     func testEveryTabHasANameAndASymbol() {
