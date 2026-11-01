@@ -24,7 +24,7 @@ public enum DashboardAction: Hashable, Sendable {
     case mediaPlayPause(entityID: String)
     case mediaVolume(entityID: String, command: String)
     case mediaSource(entityID: String, source: String)
-    case remoteCommand(entityID: String, command: String)
+    case remoteCommand(entityID: String, command: String, deviceType: String?)
 
     /// The name the server knows this action by.
     public var name: String {
@@ -75,8 +75,10 @@ public enum DashboardAction: Hashable, Sendable {
             return ["action": name, "entity_id": entityID, "command": command]
         case let .mediaSource(entityID, source):
             return ["action": name, "entity_id": entityID, "value": source]
-        case let .remoteCommand(entityID, command):
-            return ["action": name, "entity_id": entityID, "command": command]
+        case let .remoteCommand(entityID, command, deviceType):
+            var result: [String: Any] = ["action": name, "entity_id": entityID, "command": command]
+            if let deviceType { result["device_type"] = deviceType }
+            return result
         }
     }
 }

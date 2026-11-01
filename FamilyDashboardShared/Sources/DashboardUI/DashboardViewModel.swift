@@ -35,6 +35,10 @@ public final class DashboardViewModel {
     public private(set) var remoteOrder: [String]
     /// The locally preferred order of remote rooms on this device.
     public private(set) var roomOrder: [String]
+    /// Locally assigned room names, keyed by media-player entity id.
+    public private(set) var remoteRooms: [String: String]
+    /// Locally selected layout types, keyed by media-player entity id.
+    public private(set) var remoteDeviceTypes: [String: String]
     /// The name of this device, shown when it asks to pair.
     public var deviceName: String = ProcessInfo.processInfo.hostName
     /// The platform this app runs on.
@@ -45,6 +49,8 @@ public final class DashboardViewModel {
     private static let tabOrderDefaultsKey = "FamilyDashboard.iOS.tabOrder"
     private static let remoteOrderDefaultsKey = "FamilyDashboard.iOS.remoteOrder"
     private static let roomOrderDefaultsKey = "FamilyDashboard.iOS.roomOrder"
+    private static let remoteRoomsDefaultsKey = "FamilyDashboard.iOS.remoteRooms"
+    private static let remoteDeviceTypesDefaultsKey = "FamilyDashboard.iOS.remoteDeviceTypes"
     private var streamTask: Task<Void, Never>?
     private var discovery: HomeAssistantDiscovery?
 
@@ -66,6 +72,8 @@ public final class DashboardViewModel {
         self.tabOrder = savedTabs + DashboardTab.allCases.filter { !savedTabs.contains($0) }
         self.remoteOrder = UserDefaults.standard.stringArray(forKey: Self.remoteOrderDefaultsKey) ?? []
         self.roomOrder = UserDefaults.standard.stringArray(forKey: Self.roomOrderDefaultsKey) ?? []
+        self.remoteRooms = UserDefaults.standard.dictionary(forKey: Self.remoteRoomsDefaultsKey) as? [String: String] ?? [:]
+        self.remoteDeviceTypes = UserDefaults.standard.dictionary(forKey: Self.remoteDeviceTypesDefaultsKey) as? [String: String] ?? [:]
     }
 
     /// The colours of the dashboard.
@@ -82,7 +90,36 @@ public final class DashboardViewModel {
 
     /// Sort the selected media players using this device's saved preference.
     public func orderedRemotes(_ remotes: [RemoteCard]) -> [RemoteCard] {
-        RemoteCard.ordered(remotes, preferredIDs: remoteOrder)
+        let configured = remotes.map { remote -> RemoteCard in
+            var copy = remote
+            copy.room = remoteRooms[remote.entityID] ?? "Other"
+            if let type = remoteDeviceTypes[remote.entityID], type != "auto" {
+                copy.kind = type
+                copy.commands = remoteCommands(for: type, hasRemote: remote.remoteEntityID != nil)
+            }
+            return copy
+        }
+        return RemoteCard.ordered(configured, preferredIDs: remoteOrder)
+    }
+
+    /// The selected per-device type override, if the user chose one.
+    public func remoteTypeOverride(for remote: RemoteCard) -> String? {
+        guard let type = remoteDeviceTypes[remote.entityID], type != "auto" else { return nil }
+        return type
+    }
+
+    /// Save a room assignment for one player.
+    public func setRemoteRoom(_ room: String, for remote: RemoteCard) {
+        let cleaned = room.trimmingCharacters(in: .whitespacesAndNewlines)
+        remoteRooms[remote.entityID] = cleaned.isEmpty ? "Other" : String(cleaned.prefix(40))
+        UserDefaults.standard.set(remoteRooms, forKey: Self.remoteRoomsDefaultsKey)
+    }
+
+    /// Save the preferred remote layout type for one player.
+    public func setRemoteDeviceType(_ type: String, for remote: RemoteCard) {
+        let supported = ["auto", "roku", "apple_tv", "lg", "generic"]
+        remoteDeviceTypes[remote.entityID] = supported.contains(type) ? type : "auto"
+        UserDefaults.standard.set(remoteDeviceTypes, forKey: Self.remoteDeviceTypesDefaultsKey)
     }
 
     /// Return distinct room names in this device's preferred order.
@@ -139,6 +176,18 @@ public final class DashboardViewModel {
         }
         roomOrder = unique + roomOrder.filter { !unique.contains($0) }
         UserDefaults.standard.set(roomOrder, forKey: Self.roomOrderDefaultsKey)
+    }
+
+    private func remoteCommands(for kind: String, hasRemote: Bool) -> [String] {
+        guard hasRemote || kind == "lg" else { return [] }
+        var commands = ["up", "down", "left", "right", "select", "back", "home", "reverse", "forward"]
+        switch kind {
+        case "roku": commands += ["replay", "options", "info"]
+        case "apple_tv": commands.append("menu")
+        case "lg": commands.append("input")
+        default: break
+        }
+        return commands
     }
 
     /// Load the stored credential, read the dashboard and open the stream.

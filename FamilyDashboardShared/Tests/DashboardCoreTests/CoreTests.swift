@@ -89,12 +89,14 @@ final class ActionTests: XCTestCase {
     func testARemoteCommandCarriesThePlayerAndSemanticCommand() {
         let action = DashboardAction.remoteCommand(
             entityID: "media_player.living_room_roku",
-            command: "select"
+            command: "select",
+            deviceType: "roku"
         )
 
         XCTAssertEqual(action.name, "remote_command")
         XCTAssertEqual(action.body["entity_id"] as? String, "media_player.living_room_roku")
         XCTAssertEqual(action.body["command"] as? String, "select")
+        XCTAssertEqual(action.body["device_type"] as? String, "roku")
     }
 
     func testPreferredRemoteOrderAppendsNewPlayersStably() {

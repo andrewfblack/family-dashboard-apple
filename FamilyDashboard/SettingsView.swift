@@ -38,6 +38,9 @@ struct SettingsView: View {
                             TabOrderSettingsView()
                         }
                         if !(model.payload?.remotes.isEmpty ?? true) {
+                            NavigationLink("Configure remote rooms and devices") {
+                                RemoteDeviceSettingsView()
+                            }
                             NavigationLink("Reorder remote rooms") {
                                 RemoteRoomOrderSettingsView()
                             }
@@ -172,6 +175,52 @@ private struct RemoteRoomOrderSettingsView: View {
             ToolbarItem(placement: .primaryAction) {
                 EditButton()
             }
+        }
+    }
+}
+
+private struct RemoteDeviceSettingsView: View {
+    @Environment(DashboardViewModel.self) private var model
+
+    private var remotes: [RemoteCard] {
+        model.payload.map { model.orderedRemotes($0.remotes) } ?? []
+    }
+
+    var body: some View {
+        Form {
+            ForEach(remotes) { remote in
+                Section(remote.name) {
+                    TextField(
+                        "Room",
+                        text: Binding(
+                            get: { model.remoteRooms[remote.entityID] ?? "Other" },
+                            set: { model.setRemoteRoom($0, for: remote) }
+                        )
+                    )
+                    Picker(
+                        "Device type",
+                        selection: Binding(
+                            get: { model.remoteDeviceTypes[remote.entityID] ?? "auto" },
+                            set: { model.setRemoteDeviceType($0, for: remote) }
+                        )
+                    ) {
+                        Text("Automatic").tag("auto")
+                        Text("Roku").tag("roku")
+                        Text("Apple TV").tag("apple_tv")
+                        Text("LG webOS TV").tag("lg")
+                        Text("Generic remote").tag("generic")
+                    }
+                }
+            }
+        }
+        .navigationTitle("Remote Setup")
+        .safeAreaInset(edge: .bottom) {
+            Text("Use the same room name to group devices together.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(.regularMaterial)
         }
     }
 }

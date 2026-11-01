@@ -215,7 +215,11 @@ struct RemoteTab: View {
                 label: "Source",
                 expands: true
             ) {
-                run(.remoteCommand(entityID: player.entityID, command: "input"))
+                run(.remoteCommand(
+                    entityID: player.entityID,
+                    command: "input",
+                    deviceType: model.remoteTypeOverride(for: player)
+                ))
             }
         }
     }
@@ -290,7 +294,11 @@ struct RemoteTab: View {
             HStack(spacing: 14) {
                 if supportsPrevious {
                     RemoteControlButton(symbol: "backward.fill", label: "Rewind", expands: true) {
-                        run(.remoteCommand(entityID: player.entityID, command: "reverse"))
+                        run(.remoteCommand(
+                            entityID: player.entityID,
+                            command: "reverse",
+                            deviceType: model.remoteTypeOverride(for: player)
+                        ))
                     }
                 }
                 if supportsPlayback {
@@ -300,7 +308,11 @@ struct RemoteTab: View {
                 }
                 if supportsNext {
                     RemoteControlButton(symbol: "forward.fill", label: "Fast forward", expands: true) {
-                        run(.remoteCommand(entityID: player.entityID, command: "forward"))
+                        run(.remoteCommand(
+                            entityID: player.entityID,
+                            command: "forward",
+                            deviceType: model.remoteTypeOverride(for: player)
+                        ))
                     }
                 }
             }
@@ -330,7 +342,11 @@ struct RemoteTab: View {
     ) -> some View {
         if player.commands.contains(command) {
             RemoteControlButton(symbol: symbol, label: label ?? command.capitalized) {
-                run(.remoteCommand(entityID: player.entityID, command: command))
+                run(.remoteCommand(
+                    entityID: player.entityID,
+                    command: command,
+                    deviceType: model.remoteTypeOverride(for: player)
+                ))
             }
         } else {
             Color.clear.frame(width: 68, height: 58)
