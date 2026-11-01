@@ -804,6 +804,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
     public var remoteEntityID: String?
     public var name: String
     public var kind: String
+    public var room: String
     public var state: String
     public var volumeLevel: Double?
     public var isVolumeMuted: Bool
@@ -821,6 +822,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         remoteEntityID: String? = nil,
         name: String,
         kind: String = "generic",
+        room: String = "Other",
         state: String = "unknown",
         volumeLevel: Double? = nil,
         isVolumeMuted: Bool = false,
@@ -835,6 +837,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         self.remoteEntityID = remoteEntityID
         self.name = name
         self.kind = kind
+        self.room = room
         self.state = state
         self.volumeLevel = volumeLevel
         self.isVolumeMuted = isVolumeMuted
@@ -851,6 +854,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         case remoteEntityID = "remote_entity_id"
         case name
         case kind
+        case room
         case state
         case volumeLevel = "volume_level"
         case isVolumeMuted = "is_volume_muted"
@@ -883,6 +887,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         remoteEntityID = try container.decodeIfPresent(String.self, forKey: .remoteEntityID)
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? entityID
         kind = try container.decodeIfPresent(String.self, forKey: .kind) ?? "generic"
+        room = try container.decodeIfPresent(String.self, forKey: .room) ?? "Other"
         state = try container.decodeIfPresent(String.self, forKey: .state) ?? "unknown"
         volumeLevel = try container.decodeIfPresent(Double.self, forKey: .volumeLevel)
         isVolumeMuted = try container.decodeIfPresent(Bool.self, forKey: .isVolumeMuted) ?? false
