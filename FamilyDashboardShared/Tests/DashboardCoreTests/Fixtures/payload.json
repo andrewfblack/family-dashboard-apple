@@ -326,6 +326,7 @@
       "remote_entity_id": "remote.living_room_roku",
       "name": "Living Room Roku",
       "kind": "roku",
+      "room": "Living Room",
       "state": "playing",
       "volume_level": 0.35,
       "is_volume_muted": false,
@@ -333,7 +334,8 @@
       "media_artist": null,
       "source": "Netflix",
       "source_list": ["Home", "Netflix"],
-      "commands": ["up", "down", "left", "right", "select", "back", "home", "reverse", "forward", "replay", "options", "info"]
+      "commands": ["up", "down", "left", "right", "select", "back", "home", "reverse", "forward", "replay", "options", "info"],
+      "capabilities": ["turn_on", "turn_off", "volume_step", "volume_mute", "play_pause", "select_source"]
     }
   ],
   "climates": [

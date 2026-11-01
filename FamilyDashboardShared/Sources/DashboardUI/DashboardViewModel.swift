@@ -33,6 +33,8 @@ public final class DashboardViewModel {
     public private(set) var tabOrder: [DashboardTab]
     /// The locally preferred order of remote players on this device.
     public private(set) var remoteOrder: [String]
+    /// The locally preferred order of remote rooms on this device.
+    public private(set) var roomOrder: [String]
     /// The name of this device, shown when it asks to pair.
     public var deviceName: String = ProcessInfo.processInfo.hostName
     /// The platform this app runs on.
@@ -42,6 +44,7 @@ public final class DashboardViewModel {
     private let appVersion: String
     private static let tabOrderDefaultsKey = "FamilyDashboard.iOS.tabOrder"
     private static let remoteOrderDefaultsKey = "FamilyDashboard.iOS.remoteOrder"
+    private static let roomOrderDefaultsKey = "FamilyDashboard.iOS.roomOrder"
     private var streamTask: Task<Void, Never>?
     private var discovery: HomeAssistantDiscovery?
 
@@ -62,6 +65,7 @@ public final class DashboardViewModel {
         }
         self.tabOrder = savedTabs + DashboardTab.allCases.filter { !savedTabs.contains($0) }
         self.remoteOrder = UserDefaults.standard.stringArray(forKey: Self.remoteOrderDefaultsKey) ?? []
+        self.roomOrder = UserDefaults.standard.stringArray(forKey: Self.roomOrderDefaultsKey) ?? []
     }
 
     /// The colours of the dashboard.
@@ -81,6 +85,16 @@ public final class DashboardViewModel {
         RemoteCard.ordered(remotes, preferredIDs: remoteOrder)
     }
 
+    /// Return distinct room names in this device's preferred order.
+    public func orderedRooms(for remotes: [RemoteCard]) -> [String] {
+        var available: [String] = []
+        for room in orderedRemotes(remotes).map(\.room) where !available.contains(room) {
+            available.append(room)
+        }
+        return roomOrder.filter { available.contains($0) }
+            + available.filter { !roomOrder.contains($0) }
+    }
+
     /// Save a reordered tab list while retaining the order of currently disabled tabs.
     public func setTabOrder(_ orderedTabs: [DashboardTab]) {
         let currentIDs = orderedTabs.map(\.rawValue)
@@ -95,6 +109,36 @@ public final class DashboardViewModel {
         let retainedIDs = remoteOrder.filter { !currentIDs.contains($0) }
         remoteOrder = currentIDs + retainedIDs
         UserDefaults.standard.set(remoteOrder, forKey: Self.remoteOrderDefaultsKey)
+    }
+
+    /// Reorder players within one room without changing the order of other rooms.
+    public func setRemoteOrder(_ remotes: [RemoteCard], inRoom room: String) {
+        guard let currentPayload = payload else { return }
+        let allPlayers = orderedRemotes(currentPayload.remotes)
+        let roomIDs = Set(allPlayers.filter { $0.room == room }.map(\.entityID))
+        var result: [RemoteCard] = []
+        var inserted = false
+        for player in allPlayers {
+            if roomIDs.contains(player.entityID) {
+                if !inserted {
+                    result.append(contentsOf: remotes)
+                    inserted = true
+                }
+            } else {
+                result.append(player)
+            }
+        }
+        if !inserted { result.append(contentsOf: remotes) }
+        setRemoteOrder(result)
+    }
+
+    /// Save the room order while preserving rooms added by later configuration changes.
+    public func setRoomOrder(_ rooms: [String]) {
+        let unique = rooms.reduce(into: [String]()) { result, room in
+            if !result.contains(room) { result.append(room) }
+        }
+        roomOrder = unique + roomOrder.filter { !unique.contains($0) }
+        UserDefaults.standard.set(roomOrder, forKey: Self.roomOrderDefaultsKey)
     }
 
     /// Load the stored credential, read the dashboard and open the stream.

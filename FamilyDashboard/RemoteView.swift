@@ -7,26 +7,40 @@ struct RemoteTab: View {
     @Environment(DashboardViewModel.self) private var model
     @Environment(\.dashboardTheme) private var theme
     @State private var selectedPlayerID: String?
+    @State private var selectedRoom: String?
 
     let payload: DashboardPayload
 
     private var player: RemoteCard? {
-        orderedRemotes.first(where: { $0.entityID == selectedPlayerID })
-            ?? orderedRemotes.first
+        roomRemotes.first(where: { $0.entityID == selectedPlayerID })
+            ?? roomRemotes.first
     }
 
     private var orderedRemotes: [RemoteCard] {
         model.orderedRemotes(payload.remotes)
     }
 
+    private var rooms: [String] {
+        model.orderedRooms(for: payload.remotes)
+    }
+
+    private var activeRoom: String? {
+        if let selectedRoom, rooms.contains(selectedRoom) { return selectedRoom }
+        return rooms.first
+    }
+
+    private var roomRemotes: [RemoteCard] {
+        guard let activeRoom else { return [] }
+        return orderedRemotes.filter { $0.room == activeRoom }
+    }
+
     var body: some View {
         if let player {
             remoteCard(player)
-            .onAppear {
-                if selectedPlayerID == nil {
-                    selectedPlayerID = orderedRemotes.first?.entityID
+                .onAppear {
+                    if selectedRoom == nil { selectedRoom = rooms.first }
+                    if selectedPlayerID == nil { selectedPlayerID = roomRemotes.first?.entityID }
                 }
-            }
         } else {
             DashboardCard("Remote", symbol: "av.remote.fill") {
                 Text("Select media players in the Family Dashboard integration in Home Assistant.")
@@ -38,15 +52,21 @@ struct RemoteTab: View {
     private func remoteCard(_ player: RemoteCard) -> some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
-                playerSwitcher(player)
+                roomSwitcher
                 Spacer(minLength: 8)
                 Text(deviceType(player.kind))
                     .font(.caption.weight(.bold))
                     .foregroundStyle(theme.muted)
             }
+            devicePicker(player)
 
             nowPlaying(player)
             divider
+            if player.kind == "apple_tv", player.remoteEntityID == nil {
+                Text("Apple TV directional controls are unavailable. Enable its Remote entity in Home Assistant.")
+                    .font(.caption)
+                    .foregroundStyle(theme.muted)
+            }
             powerAndSource(player)
 
             if !player.commands.isEmpty {
@@ -66,31 +86,65 @@ struct RemoteTab: View {
         )
     }
 
-    private func playerSwitcher(_ player: RemoteCard) -> some View {
+    private var roomSwitcher: some View {
         Menu {
-            ForEach(orderedRemotes) { option in
+            ForEach(rooms, id: \.self) { room in
                 Button {
-                    selectedPlayerID = option.entityID
+                    selectedRoom = room
+                    selectedPlayerID = orderedRemotes.first(where: { $0.room == room })?.entityID
                 } label: {
-                    if option.entityID == player.entityID {
-                        Label(option.name, systemImage: "checkmark")
+                    if room == activeRoom {
+                        Label(room, systemImage: "checkmark")
                     } else {
-                        Text(option.name)
+                        Text(room)
                     }
                 }
             }
         } label: {
             HStack(spacing: 8) {
-                Text(player.name)
+                Text(activeRoom ?? "Room")
                     .font(.title2.weight(.bold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.caption.weight(.bold))
             }
-            .foregroundStyle(theme.itemHeader)
+            .foregroundStyle(theme.header)
         }
-        .accessibilityLabel("Media player, \(player.name)")
+        .accessibilityLabel("Room, \(activeRoom ?? "Room")")
+    }
+
+    private func devicePicker(_ player: RemoteCard) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(roomRemotes) { remote in
+                    let isSelected = remote.entityID == player.entityID
+                    Button {
+                        selectedPlayerID = remote.entityID
+                    } label: {
+                        VStack(spacing: 6) {
+                            Image(systemName: deviceSymbol(remote.kind))
+                                .font(.title3.weight(.semibold))
+                                .frame(width: 48, height: 44)
+                            Text(remote.name)
+                                .font(.caption2.weight(.medium))
+                                .lineLimit(1)
+                                .frame(maxWidth: 96)
+                        }
+                        .foregroundStyle(isSelected ? theme.accentColor : theme.body)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(
+                            isSelected ? theme.selectedBackgroundColor : .clear,
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(remote.name), \(deviceType(remote.kind))")
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
+        }
     }
 
     private func nowPlaying(_ player: RemoteCard) -> some View {
@@ -115,23 +169,32 @@ struct RemoteTab: View {
         }
     }
 
+    @ViewBuilder
     private func powerAndSource(_ player: RemoteCard) -> some View {
-        HStack(spacing: 14) {
-            RemoteControlButton(
-                symbol: "power",
-                label: "Power",
-                expands: true
-            ) {
-                run(.mediaPower(entityID: player.entityID))
+        let supportsPower = supportsPowerToggle(player)
+        let supportsSource = supportsSourceSelection(player)
+        if supportsPower || supportsSource {
+            HStack(spacing: 14) {
+                if supportsPower {
+                    RemoteControlButton(
+                        symbol: "power",
+                        label: "Power",
+                        expands: true
+                    ) {
+                        run(.mediaPower(entityID: player.entityID))
+                    }
+                }
+                if supportsSource {
+                    sourceControl(player)
+                }
             }
-            sourceControl(player)
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
     private func sourceControl(_ player: RemoteCard) -> some View {
-        if !player.sourceList.isEmpty {
+        if player.capabilities.contains("select_source"), !player.sourceList.isEmpty {
             Menu {
                 ForEach(player.sourceList, id: \.self) { source in
                     Button(source) {
@@ -154,14 +217,6 @@ struct RemoteTab: View {
             ) {
                 run(.remoteCommand(entityID: player.entityID, command: "input"))
             }
-        } else {
-            RemoteControlButton(
-                symbol: "rectangle.connected.to.line.below",
-                label: "Source",
-                expands: true,
-                enabled: false,
-                action: {}
-            )
         }
     }
 
@@ -196,51 +251,74 @@ struct RemoteTab: View {
         }
     }
 
+    @ViewBuilder
     private func volumeControls(_ player: RemoteCard) -> some View {
-        HStack(spacing: 14) {
-            RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
-                run(.mediaVolume(entityID: player.entityID, command: "down"))
+        let supportsSteps = player.capabilities.contains("volume_step")
+        let supportsMute = player.capabilities.contains("volume_mute")
+        if supportsSteps || supportsMute {
+            HStack(spacing: 14) {
+                if supportsSteps {
+                    RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
+                        run(.mediaVolume(entityID: player.entityID, command: "down"))
+                    }
+                }
+                if supportsMute {
+                    RemoteControlButton(
+                        symbol: player.isVolumeMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
+                        label: "Mute",
+                        expands: true
+                    ) {
+                        run(.mediaVolume(entityID: player.entityID, command: "mute"))
+                    }
+                }
+                if supportsSteps {
+                    RemoteControlButton(symbol: "speaker.plus.fill", label: "Volume up", expands: true) {
+                        run(.mediaVolume(entityID: player.entityID, command: "up"))
+                    }
+                }
             }
-            RemoteControlButton(
-                symbol: player.isVolumeMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                label: "Mute",
-                expands: true
-            ) {
-                run(.mediaVolume(entityID: player.entityID, command: "mute"))
-            }
-            RemoteControlButton(symbol: "speaker.plus.fill", label: "Volume up", expands: true) {
-                run(.mediaVolume(entityID: player.entityID, command: "up"))
-            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
     }
 
+    @ViewBuilder
     private func playbackControls(_ player: RemoteCard) -> some View {
-        HStack(spacing: 14) {
-            RemoteControlButton(
-                symbol: "backward.fill",
-                label: "Rewind",
-                expands: true,
-                enabled: player.commands.contains("reverse")
-            ) {
-                run(.remoteCommand(entityID: player.entityID, command: "reverse"))
+        let supportsPrevious = player.commands.contains("reverse")
+        let supportsPlayback = player.capabilities.contains("play_pause")
+        let supportsNext = player.commands.contains("forward")
+        if supportsPrevious || supportsPlayback || supportsNext {
+            HStack(spacing: 14) {
+                if supportsPrevious {
+                    RemoteControlButton(symbol: "backward.fill", label: "Rewind", expands: true) {
+                        run(.remoteCommand(entityID: player.entityID, command: "reverse"))
+                    }
+                }
+                if supportsPlayback {
+                    RemoteControlButton(symbol: "playpause.fill", label: "Play or pause", expands: true) {
+                        run(.mediaPlayPause(entityID: player.entityID))
+                    }
+                }
+                if supportsNext {
+                    RemoteControlButton(symbol: "forward.fill", label: "Fast forward", expands: true) {
+                        run(.remoteCommand(entityID: player.entityID, command: "forward"))
+                    }
+                }
             }
-            RemoteControlButton(
-                symbol: "playpause.fill",
-                label: "Play / Pause",
-                expands: true
-            ) {
-                run(.mediaPlayPause(entityID: player.entityID))
-            }
-            RemoteControlButton(
-                symbol: "forward.fill",
-                label: "Fast forward",
-                expands: true,
-                enabled: player.commands.contains("forward")
-            ) {
-                run(.remoteCommand(entityID: player.entityID, command: "forward"))
-            }
+            .frame(maxWidth: .infinity)
         }
+    }
+
+    private func supportsPowerToggle(_ player: RemoteCard) -> Bool {
+        switch player.state.lowercased() {
+        case "off", "standby": return player.capabilities.contains("turn_on")
+        case "unknown", "unavailable": return false
+        default: return player.capabilities.contains("turn_off")
+        }
+    }
+
+    private func supportsSourceSelection(_ player: RemoteCard) -> Bool {
+        (player.capabilities.contains("select_source") && !player.sourceList.isEmpty)
+            || player.commands.contains("input")
     }
 
     @ViewBuilder
@@ -290,6 +368,15 @@ struct RemoteTab: View {
         case "roku": return "ROKU"
         case "lg": return "LG TV"
         default: return "MEDIA PLAYER"
+        }
+    }
+
+    private func deviceSymbol(_ kind: String) -> String {
+        switch kind {
+        case "apple_tv": return "appletv.fill"
+        case "roku": return "play.tv.fill"
+        case "lg": return "tv.fill"
+        default: return "av.remote.fill"
         }
     }
 

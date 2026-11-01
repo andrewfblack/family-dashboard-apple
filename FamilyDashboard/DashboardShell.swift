@@ -402,7 +402,7 @@ struct WeatherTab: View {
                     symbol: "chart.bar"
                 ) {
                     if sizeClass == .compact {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 12) {
+                        LazyVStack(spacing: 12) {
                             ForEach(payload.weather.forecast) { forecast in
                                 ForecastTile(forecast: forecast)
                             }
@@ -423,14 +423,28 @@ struct WeatherTab: View {
 /// The lights that may be toggled and dimmed.
 struct LightsTab: View {
     @Environment(DashboardViewModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let payload: DashboardPayload
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160))], spacing: 16) {
-            ForEach(payload.lights) { light in
-                LightTile(light: light) { action in
-                    Task { await model.run(action) }
+        Group {
+            if sizeClass == .compact {
+                LazyVStack(spacing: 16) {
+                    lightTiles
                 }
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 16) {
+                    lightTiles
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var lightTiles: some View {
+        ForEach(payload.lights) { light in
+            LightTile(light: light) { action in
+                Task { await model.run(action) }
             }
         }
     }
@@ -439,14 +453,28 @@ struct LightsTab: View {
 /// The scenes and scripts that may be activated.
 struct ScenesTab: View {
     @Environment(DashboardViewModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let payload: DashboardPayload
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 160))], spacing: 16) {
-            ForEach(payload.scenes) { scene in
-                SceneTile(scene: scene) { action in
-                    Task { await model.run(action) }
+        Group {
+            if sizeClass == .compact {
+                LazyVStack(spacing: 16) {
+                    sceneTiles
                 }
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 240))], spacing: 16) {
+                    sceneTiles
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var sceneTiles: some View {
+        ForEach(payload.scenes) { scene in
+            SceneTile(scene: scene) { action in
+                Task { await model.run(action) }
             }
         }
     }

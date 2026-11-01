@@ -82,8 +82,10 @@ final class PayloadTests: XCTestCase {
 
         XCTAssertTrue(payload.tabs.remote)
         XCTAssertEqual(payload.remotes.first?.kind, "roku")
+        XCTAssertEqual(payload.remotes.first?.room, "Living Room")
         XCTAssertEqual(payload.remotes.first?.remoteEntityID, "remote.living_room_roku")
         XCTAssertTrue(payload.remotes.first?.commands.contains("replay") == true)
+        XCTAssertTrue(payload.remotes.first?.capabilities.contains("volume_step") == true)
     }
 
     func testTheCapabilitiesAreRead() throws {

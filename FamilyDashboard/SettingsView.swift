@@ -38,6 +38,9 @@ struct SettingsView: View {
                             TabOrderSettingsView()
                         }
                         if !(model.payload?.remotes.isEmpty ?? true) {
+                            NavigationLink("Reorder remote rooms") {
+                                RemoteRoomOrderSettingsView()
+                            }
                             NavigationLink("Reorder remote players") {
                                 RemoteOrderSettingsView()
                             }
@@ -108,17 +111,21 @@ private struct RemoteOrderSettingsView: View {
 
     var body: some View {
         List {
-            ForEach(remotes) { remote in
-                HStack {
-                    Image(systemName: icon(for: remote.kind))
-                        .foregroundStyle(.secondary)
-                    Text(remote.name)
+            ForEach(model.orderedRooms(for: remotes), id: \.self) { room in
+                Section(room) {
+                    ForEach(remotes.filter { $0.room == room }) { remote in
+                        HStack {
+                            Image(systemName: icon(for: remote.kind))
+                                .foregroundStyle(.secondary)
+                            Text(remote.name)
+                        }
+                    }
+                    .onMove { indices, destination in
+                        var roomRemotes = remotes.filter { $0.room == room }
+                        roomRemotes.move(fromOffsets: indices, toOffset: destination)
+                        model.setRemoteOrder(roomRemotes, inRoom: room)
+                    }
                 }
-            }
-            .onMove { indices, destination in
-                var ordered = remotes
-                ordered.move(fromOffsets: indices, toOffset: destination)
-                model.setRemoteOrder(ordered)
             }
         }
         .environment(\.editMode, $editMode)
@@ -136,6 +143,35 @@ private struct RemoteOrderSettingsView: View {
         case "roku": return "play.tv.fill"
         case "lg": return "tv.fill"
         default: return "av.remote.fill"
+        }
+    }
+}
+
+private struct RemoteRoomOrderSettingsView: View {
+    @Environment(DashboardViewModel.self) private var model
+    @State private var editMode: EditMode = .inactive
+
+    private var rooms: [String] {
+        model.payload.map { model.orderedRooms(for: $0.remotes) } ?? []
+    }
+
+    var body: some View {
+        List {
+            ForEach(rooms, id: \.self) { room in
+                Label(room, systemImage: "door.left.hand.open")
+            }
+            .onMove { indices, destination in
+                var reordered = rooms
+                reordered.move(fromOffsets: indices, toOffset: destination)
+                model.setRoomOrder(reordered)
+            }
+        }
+        .environment(\.editMode, $editMode)
+        .navigationTitle("Remote Rooms")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                EditButton()
+            }
         }
     }
 }

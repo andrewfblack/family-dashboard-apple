@@ -812,6 +812,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
     public var source: String?
     public var sourceList: [String]
     public var commands: [String]
+    public var capabilities: [String]
 
     public var id: String { entityID }
 
@@ -827,7 +828,8 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         mediaArtist: String? = nil,
         source: String? = nil,
         sourceList: [String] = [],
-        commands: [String] = []
+        commands: [String] = [],
+        capabilities: [String] = []
     ) {
         self.entityID = entityID
         self.remoteEntityID = remoteEntityID
@@ -841,6 +843,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         self.source = source
         self.sourceList = sourceList
         self.commands = commands
+        self.capabilities = capabilities
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -856,6 +859,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         case source
         case sourceList = "source_list"
         case commands
+        case capabilities
     }
 
     /// Put available players in the preferred order, appending newly selected players.
@@ -887,6 +891,7 @@ public struct RemoteCard: Codable, Hashable, Identifiable, Sendable {
         source = try container.decodeIfPresent(String.self, forKey: .source)
         sourceList = try container.decodeIfPresent([String].self, forKey: .sourceList) ?? []
         commands = try container.decodeIfPresent([String].self, forKey: .commands) ?? []
+        capabilities = try container.decodeIfPresent([String].self, forKey: .capabilities) ?? []
     }
 }
 

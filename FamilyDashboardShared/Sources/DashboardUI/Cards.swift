@@ -425,18 +425,33 @@ public struct ClimateTile: View {
                 }
                 .buttonStyle(.bordered)
             }
-            HStack(spacing: 8) {
-                ForEach(climate.hvacModes, id: \.self) { mode in
-                    Button {
-                        action(.climateMode(entityID: climate.entityID, mode: mode))
-                    } label: {
-                        Image(systemName: WeatherSymbols.symbol(forMode: mode))
-                            .frame(minWidth: 34, minHeight: 34)
+            if !climate.hvacModes.isEmpty {
+                Menu {
+                    ForEach(climate.hvacModes, id: \.self) { mode in
+                        Button {
+                            action(.climateMode(entityID: climate.entityID, mode: mode))
+                        } label: {
+                            if climate.state == mode {
+                                Label(
+                                    mode.replacingOccurrences(of: "_", with: " ").capitalized,
+                                    systemImage: "checkmark"
+                                )
+                            } else {
+                                Text(mode.replacingOccurrences(of: "_", with: " ").capitalized)
+                            }
+                        }
                     }
-                    .accessibilityLabel(mode.replacingOccurrences(of: "_", with: " "))
-                    .buttonStyle(.borderedProminent)
-                    .tint(climate.state == mode ? theme.accentColor : theme.itemBorderColor)
+                } label: {
+                    Label {
+                        Text("Mode: \(climate.state.replacingOccurrences(of: "_", with: " ").capitalized)")
+                    } icon: {
+                        Image(systemName: WeatherSymbols.symbol(forMode: climate.state))
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 38, alignment: .leading)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(theme.accentColor)
+                .accessibilityLabel("Climate mode, \(climate.state.replacingOccurrences(of: "_", with: " "))")
             }
         }
         .padding(14)
