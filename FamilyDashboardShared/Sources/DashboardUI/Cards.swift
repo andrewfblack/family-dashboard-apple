@@ -305,16 +305,26 @@ public struct LightTile: View {
             .buttonStyle(.borderedProminent)
             .tint(theme.accentColor)
             if light.isOn {
-                HStack(spacing: 8) {
+                LazyVGrid(
+                    columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 4),
+                    spacing: 6
+                ) {
                     ForEach([25, 50, 75, 100], id: \.self) { percent in
                         Button {
                             action(.lightBrightness(entityID: light.entityID, percent: percent))
                         } label: {
-                            Image(systemName: brightnessSymbol(percent))
-                                .frame(minWidth: 30, minHeight: 30)
+                            VStack(spacing: 3) {
+                                Image(systemName: brightnessSymbol(percent))
+                                    .font(.caption)
+                                Text("\(percent)%")
+                                    .font(.caption2.weight(.semibold))
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 42)
                         }
                         .accessibilityLabel("Brightness \(percent) percent")
                         .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        .tint(theme.itemHeader)
                     }
                 }
             }

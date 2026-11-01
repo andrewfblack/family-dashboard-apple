@@ -124,12 +124,8 @@ struct RemoteTab: View {
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: deviceSymbol(remote.kind))
-                                .font(.title3.weight(.semibold))
-                                .frame(width: 48, height: 44)
-                            Text(remote.name)
-                                .font(.caption2.weight(.medium))
-                                .lineLimit(1)
-                                .frame(maxWidth: 96)
+                                .font(.title2.weight(.semibold))
+                                .frame(width: 56, height: 52)
                         }
                         .foregroundStyle(isSelected ? theme.accentColor : theme.body)
                         .padding(.horizontal, 8)
