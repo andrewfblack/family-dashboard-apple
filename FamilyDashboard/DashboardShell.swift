@@ -178,7 +178,7 @@ struct TabContent: View {
                     .frame(maxWidth: .infinity, minHeight: 220)
                 }
             }
-            .padding(20)
+            .padding(tab == .remote ? 8 : 20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .refreshable {

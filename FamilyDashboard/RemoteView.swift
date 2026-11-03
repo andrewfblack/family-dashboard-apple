@@ -50,8 +50,8 @@ struct RemoteTab: View {
     }
 
     private func remoteCard(_ player: RemoteCard) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 roomSwitcher
                 Spacer(minLength: 8)
                 Text(deviceType(player.kind))
@@ -74,10 +74,9 @@ struct RemoteTab: View {
                 shortcutControls(player)
             }
 
-            volumeControls(player)
-            playbackControls(player)
+            transportAndVolumeControls(player)
         }
-        .padding(16)
+        .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 18))
         .overlay(
@@ -116,20 +115,19 @@ struct RemoteTab: View {
 
     private func devicePicker(_ player: RemoteCard) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 6) {
                 ForEach(roomRemotes) { remote in
                     let isSelected = remote.entityID == player.entityID
                     Button {
                         selectedPlayerID = remote.entityID
                     } label: {
-                        VStack(spacing: 6) {
+                        VStack(spacing: 0) {
                             Image(systemName: deviceSymbol(remote.kind))
-                                .font(.title2.weight(.semibold))
-                                .frame(width: 56, height: 52)
+                                .font(.title3.weight(.semibold))
+                                .frame(width: 42, height: 40)
                         }
                         .foregroundStyle(isSelected ? theme.accentColor : theme.body)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 6)
+                        .padding(3)
                         .background(
                             isSelected ? theme.selectedBackgroundColor : .clear,
                             in: RoundedRectangle(cornerRadius: 12)
@@ -144,24 +142,15 @@ struct RemoteTab: View {
     }
 
     private func nowPlaying(_ player: RemoteCard) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(player.name)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(theme.muted)
+                .lineLimit(1)
             Text(player.mediaTitle ?? player.source ?? stateLabel(player.state))
-                .font(.headline)
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(theme.body)
-            if let artist = player.mediaArtist, !artist.isEmpty {
-                Text(artist)
-                    .font(.subheadline)
-                    .foregroundStyle(theme.muted)
-            } else if player.mediaTitle != nil, let source = player.source {
-                Text(source)
-                    .font(.subheadline)
-                    .foregroundStyle(theme.muted)
-            }
-            if let volume = player.volumeLevel {
-                Text("Volume \(Int((volume * 100).rounded()))%")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(theme.muted)
-            }
+                .lineLimit(1)
         }
     }
 
@@ -170,7 +159,7 @@ struct RemoteTab: View {
         let supportsPower = supportsPowerToggle(player)
         let supportsSource = supportsSourceSelection(player)
         if supportsPower || supportsSource {
-            HStack(spacing: 14) {
+            HStack(spacing: 8) {
                 if supportsPower {
                     RemoteControlButton(
                         symbol: "power",
@@ -221,11 +210,11 @@ struct RemoteTab: View {
     }
 
     private func directionPad(_ player: RemoteCard) -> some View {
-        Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
             GridRow {
-                Color.clear.frame(width: 68, height: 58)
+                Color.clear.frame(width: 44, height: 44)
                 commandButton("up", symbol: "chevron.up", player: player)
-                Color.clear.frame(width: 68, height: 58)
+                Color.clear.frame(width: 44, height: 44)
             }
             GridRow {
                 commandButton("left", symbol: "chevron.left", player: player)
@@ -233,9 +222,9 @@ struct RemoteTab: View {
                 commandButton("right", symbol: "chevron.right", player: player)
             }
             GridRow {
-                Color.clear.frame(width: 68, height: 58)
+                Color.clear.frame(width: 44, height: 44)
                 commandButton("down", symbol: "chevron.down", player: player)
-                Color.clear.frame(width: 68, height: 58)
+                Color.clear.frame(width: 44, height: 44)
             }
         }
         .frame(maxWidth: .infinity)
@@ -244,7 +233,7 @@ struct RemoteTab: View {
     private func shortcutControls(_ player: RemoteCard) -> some View {
         let commands = ["back", "home", "menu", "replay", "options"]
             .filter { player.commands.contains($0) }
-        return LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 12) {
+        return HStack(spacing: 4) {
             ForEach(commands, id: \.self) { command in
                 commandButton(command, symbol: symbol(forCommand: command), player: player)
             }
@@ -252,42 +241,14 @@ struct RemoteTab: View {
     }
 
     @ViewBuilder
-    private func volumeControls(_ player: RemoteCard) -> some View {
+    private func transportAndVolumeControls(_ player: RemoteCard) -> some View {
         let supportsSteps = player.capabilities.contains("volume_step")
         let supportsMute = player.capabilities.contains("volume_mute")
-        if supportsSteps || supportsMute {
-            HStack(spacing: 14) {
-                if supportsSteps {
-                    RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
-                        run(.mediaVolume(entityID: player.entityID, command: "down"))
-                    }
-                }
-                if supportsMute {
-                    RemoteControlButton(
-                        symbol: player.isVolumeMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                        label: "Mute",
-                        expands: true
-                    ) {
-                        run(.mediaVolume(entityID: player.entityID, command: "mute"))
-                    }
-                }
-                if supportsSteps {
-                    RemoteControlButton(symbol: "speaker.plus.fill", label: "Volume up", expands: true) {
-                        run(.mediaVolume(entityID: player.entityID, command: "up"))
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity)
-        }
-    }
-
-    @ViewBuilder
-    private func playbackControls(_ player: RemoteCard) -> some View {
         let supportsPrevious = player.commands.contains("reverse")
         let supportsPlayback = player.capabilities.contains("play_pause")
         let supportsNext = player.commands.contains("forward")
-        if supportsPrevious || supportsPlayback || supportsNext {
-            HStack(spacing: 14) {
+        if supportsSteps || supportsMute || supportsPrevious || supportsPlayback || supportsNext {
+            HStack(spacing: 3) {
                 if supportsPrevious {
                     RemoteControlButton(symbol: "backward.fill", label: "Rewind", expands: true) {
                         run(.remoteCommand(
@@ -309,6 +270,25 @@ struct RemoteTab: View {
                             command: "forward",
                             deviceType: model.remoteTypeOverride(for: player)
                         ))
+                    }
+                }
+                if supportsSteps {
+                    RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
+                        run(.mediaVolume(entityID: player.entityID, command: "down"))
+                    }
+                }
+                if supportsMute {
+                    RemoteControlButton(
+                        symbol: player.isVolumeMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
+                        label: "Mute",
+                        expands: true
+                    ) {
+                        run(.mediaVolume(entityID: player.entityID, command: "mute"))
+                    }
+                }
+                if supportsSteps {
+                    RemoteControlButton(symbol: "speaker.plus.fill", label: "Volume up", expands: true) {
+                        run(.mediaVolume(entityID: player.entityID, command: "up"))
                     }
                 }
             }
@@ -345,7 +325,7 @@ struct RemoteTab: View {
                 ))
             }
         } else {
-            Color.clear.frame(width: 68, height: 58)
+            Color.clear.frame(width: 44, height: 44)
         }
     }
 
@@ -359,7 +339,7 @@ struct RemoteTab: View {
         Image(systemName: symbol)
             .font(.title3.weight(.semibold))
             .foregroundStyle(theme.remoteButtonTextColor)
-            .frame(maxWidth: expands ? .infinity : 68, minHeight: 56)
+            .frame(maxWidth: expands ? .infinity : 44, minHeight: 44)
             .background(
                 theme.remoteButtonBackgroundColor,
                 in: RoundedRectangle(cornerRadius: 12)
@@ -409,6 +389,7 @@ private struct RemoteControlButton: View {
     let symbol: String
     let label: String
     var expands = false
+    var size: CGFloat = 44
     var enabled = true
     let action: () -> Void
 
@@ -416,12 +397,14 @@ private struct RemoteControlButton: View {
         symbol: String,
         label: String,
         expands: Bool = false,
+        size: CGFloat = 44,
         enabled: Bool = true,
         action: @escaping () -> Void
     ) {
         self.symbol = symbol
         self.label = label
         self.expands = expands
+        self.size = size
         self.enabled = enabled
         self.action = action
     }
@@ -431,7 +414,7 @@ private struct RemoteControlButton: View {
             Image(systemName: symbol)
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(theme.remoteButtonTextColor)
-                .frame(maxWidth: expands ? .infinity : 68, minHeight: 56)
+                .frame(maxWidth: expands ? .infinity : size, minHeight: size)
                 .background(
                     theme.remoteButtonBackgroundColor,
                     in: RoundedRectangle(cornerRadius: 12)
