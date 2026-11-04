@@ -50,7 +50,7 @@ struct RemoteTab: View {
     }
 
     private func remoteCard(_ player: RemoteCard) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 9) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 roomSwitcher
                 Spacer(minLength: 8)
@@ -74,9 +74,10 @@ struct RemoteTab: View {
                 shortcutControls(player)
             }
 
-            transportAndVolumeControls(player)
+            playbackControls(player)
+            volumeControls(player)
         }
-        .padding(8)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(theme.itemBackgroundColor, in: RoundedRectangle(cornerRadius: 18))
         .overlay(
@@ -124,10 +125,10 @@ struct RemoteTab: View {
                         VStack(spacing: 0) {
                             Image(systemName: deviceSymbol(remote.kind))
                                 .font(.title3.weight(.semibold))
-                                .frame(width: 42, height: 40)
+                                .frame(width: 48, height: 48)
                         }
                         .foregroundStyle(isSelected ? theme.accentColor : theme.body)
-                        .padding(3)
+                        .padding(4)
                         .background(
                             isSelected ? theme.selectedBackgroundColor : .clear,
                             in: RoundedRectangle(cornerRadius: 12)
@@ -210,11 +211,11 @@ struct RemoteTab: View {
     }
 
     private func directionPad(_ player: RemoteCard) -> some View {
-        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
             GridRow {
-                Color.clear.frame(width: 44, height: 44)
+                Color.clear.frame(width: 50, height: 50)
                 commandButton("up", symbol: "chevron.up", player: player)
-                Color.clear.frame(width: 44, height: 44)
+                Color.clear.frame(width: 50, height: 50)
             }
             GridRow {
                 commandButton("left", symbol: "chevron.left", player: player)
@@ -222,9 +223,9 @@ struct RemoteTab: View {
                 commandButton("right", symbol: "chevron.right", player: player)
             }
             GridRow {
-                Color.clear.frame(width: 44, height: 44)
+                Color.clear.frame(width: 50, height: 50)
                 commandButton("down", symbol: "chevron.down", player: player)
-                Color.clear.frame(width: 44, height: 44)
+                Color.clear.frame(width: 50, height: 50)
             }
         }
         .frame(maxWidth: .infinity)
@@ -233,7 +234,7 @@ struct RemoteTab: View {
     private func shortcutControls(_ player: RemoteCard) -> some View {
         let commands = ["back", "home", "menu", "replay", "options"]
             .filter { player.commands.contains($0) }
-        return HStack(spacing: 4) {
+        return HStack(spacing: 6) {
             ForEach(commands, id: \.self) { command in
                 commandButton(command, symbol: symbol(forCommand: command), player: player)
             }
@@ -241,14 +242,12 @@ struct RemoteTab: View {
     }
 
     @ViewBuilder
-    private func transportAndVolumeControls(_ player: RemoteCard) -> some View {
-        let supportsSteps = player.capabilities.contains("volume_step")
-        let supportsMute = player.capabilities.contains("volume_mute")
+    private func playbackControls(_ player: RemoteCard) -> some View {
         let supportsPrevious = player.commands.contains("reverse")
         let supportsPlayback = player.capabilities.contains("play_pause")
         let supportsNext = player.commands.contains("forward")
-        if supportsSteps || supportsMute || supportsPrevious || supportsPlayback || supportsNext {
-            HStack(spacing: 3) {
+        if supportsPrevious || supportsPlayback || supportsNext {
+            HStack(spacing: 8) {
                 if supportsPrevious {
                     RemoteControlButton(symbol: "backward.fill", label: "Rewind", expands: true) {
                         run(.remoteCommand(
@@ -272,6 +271,17 @@ struct RemoteTab: View {
                         ))
                     }
                 }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    @ViewBuilder
+    private func volumeControls(_ player: RemoteCard) -> some View {
+        let supportsSteps = player.capabilities.contains("volume_step")
+        let supportsMute = player.capabilities.contains("volume_mute")
+        if supportsSteps || supportsMute {
+            HStack(spacing: 8) {
                 if supportsSteps {
                     RemoteControlButton(symbol: "speaker.minus.fill", label: "Volume down", expands: true) {
                         run(.mediaVolume(entityID: player.entityID, command: "down"))
@@ -325,7 +335,7 @@ struct RemoteTab: View {
                 ))
             }
         } else {
-            Color.clear.frame(width: 44, height: 44)
+            Color.clear.frame(width: 50, height: 50)
         }
     }
 
@@ -339,7 +349,7 @@ struct RemoteTab: View {
         Image(systemName: symbol)
             .font(.title3.weight(.semibold))
             .foregroundStyle(theme.remoteButtonTextColor)
-            .frame(maxWidth: expands ? .infinity : 44, minHeight: 44)
+            .frame(maxWidth: expands ? .infinity : 50, minHeight: 50)
             .background(
                 theme.remoteButtonBackgroundColor,
                 in: RoundedRectangle(cornerRadius: 12)
@@ -389,7 +399,7 @@ private struct RemoteControlButton: View {
     let symbol: String
     let label: String
     var expands = false
-    var size: CGFloat = 44
+    var size: CGFloat = 50
     var enabled = true
     let action: () -> Void
 
@@ -397,7 +407,7 @@ private struct RemoteControlButton: View {
         symbol: String,
         label: String,
         expands: Bool = false,
-        size: CGFloat = 44,
+        size: CGFloat = 50,
         enabled: Bool = true,
         action: @escaping () -> Void
     ) {
